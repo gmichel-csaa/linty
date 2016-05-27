@@ -5,7 +5,7 @@ Badge Markdown:
 <object data="{{ badge_url }}" type="image/svg+xml"></object>
 
 <ul>
-    {% for build in object_list %}
+    {% for build in builds %}
         <li>
             {% if build.status == 'error' %}
             <a href="{% url 'build_detail' pk=build.pk %}">
