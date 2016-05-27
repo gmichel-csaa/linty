@@ -39,6 +39,7 @@ class RepoDetailView(LoginRequiredMixin, generic.DetailView):
         object = self.object
         url = reverse('badge', kwargs={'full_name': object.full_name})
 
+        kwargs['absolute_url'] = self.request.build_absolute_uri(self.request.path)
         kwargs['builds'] = Build.objects.filter(repo=object)
         kwargs['badge_url'] = self.request.build_absolute_uri(url)
 
