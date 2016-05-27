@@ -48,7 +48,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
 
     def get_queryset(self):
-        return Repo.objects.filter(user=self.request.user)
+        return Repo.objects.filter(user=self.request.user, webhook_id__isnull=False)
 
     def get_context_data(self, **kwargs):
         queryset = kwargs.pop('object_list', self.object_list)
@@ -66,8 +66,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
         return super(RepoListView, self).get_context_data(**kwargs)
 
 
-class RepoDeleteView(LoginRequiredMixin, generic.DeleteView):
-    success_url = reverse_lazy('repo_list')
+class RepoDeleteView(LoginRequiredMixin, generic.DetailView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
@@ -78,7 +77,7 @@ class RepoDeleteView(LoginRequiredMixin, generic.DeleteView):
         if obj.user != self.request.user:
             return HttpResponse(status=403)
 
-        obj.delete()
+        obj.soft_delete()
 
         return redirect(reverse('repo_list'))
 
@@ -100,7 +99,10 @@ def ProcessRepo(request, full_name):
         active=True
     )
 
-    repo = Repo.objects.create(full_name=grepo.full_name, user=user, webhook_id=hook.id)
+    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
+
+    repo.webhook_id = hook.id
+    repo.save()
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
