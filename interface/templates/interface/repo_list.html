@@ -11,7 +11,10 @@
 
 <h2>Available Repos</h2>
 <ul>
-{% for obj in repos %}
-<li><a href="{% url 'process_repo' full_name=obj.full_name %}">{{ obj.full_name }}</a></li>
-{% endfor %}
+    {% for obj in repos %}
+    <li>
+        {{ obj.full_name }}
+        [<a href="{% url 'process_repo' full_name=obj.full_name %}">Lint this repo</a>]
+    </li>
+    {% endfor %}
 </ul>
