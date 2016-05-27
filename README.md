@@ -8,8 +8,9 @@ Linty is _Linting as a Service_. Users can sign in with Github, select a repo, a
 
 Features:
 * One click repo registration/de-registration
-* Pass/fail statuses on Pull Requests
+* Pass/Fail statuses on Pull Requests
 * History of lint results
+* Pass/Fail Badges for your READMEs
 
 The app is live at [linty.herokuapp.com](https://linty.herokuapp.com). It's currently running on free dynos, so if the site hangs for a while when you first visit it, it's just the dynos waking up.
 
