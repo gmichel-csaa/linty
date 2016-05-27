@@ -1,9 +1,15 @@
 {% load humanize %}
 
-<a href="{% url 'repo_list' %}">Back to Repos</a> |
-<a href="{% url 'repo_detail' full_name=object.repo.full_name %}">Back to Repo</a>
+{% if user.is_authenticated %}
+    <ul>
+        <li><a href="{% url 'repo_list' %}">Back to Repos</a></li>
+        {% if user == object.repo.user %}
+        <li><a href="{% url 'repo_detail' full_name=object.repo.full_name %}">Back to Repo</a></li>
+        {% endif %}
+    </ul>
+{% endif %}
 
-<h2>{{ object.repo.full_name }} : {{ object.sha }}</h2>
+<h2>{{ object.repo.full_name }} : {{ object.short_sha }}</h2>
 
 <ul>
     <li>Branch: {{ object.ref }}</li>

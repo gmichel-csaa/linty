@@ -46,6 +46,10 @@ class Build(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def short_sha(self):
+        return self.sha[:7]
+
     def get_duration(self):
         delta = self.finished_at - self.created_at
         s = delta.seconds

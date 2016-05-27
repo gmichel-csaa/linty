@@ -18,16 +18,8 @@ from interface.models import Build, Repo
 from interface.utils import get_github
 
 
-class BuildDetailView(LoginRequiredMixin, generic.DetailView):
+class BuildDetailView(generic.DetailView):
     model = Build
-
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-
-        if obj.repo.user != self.request.user:
-            return HttpResponse(status=403)
-
-        return super(BuildDetailView, self).get(request, *args, **kwargs)
 
 
 class RepoDetailView(LoginRequiredMixin, generic.DetailView):
@@ -170,7 +162,7 @@ def WebhookView(request):
     # download repo
     if not os.path.exists('tmp'):
         os.makedirs('tmp')
-    directory = 'tmp/%s' % sha
+    directory = 'tmp/%s' % sha[:7]
     if os.path.exists(directory):
         shutil.rmtree(directory)
     subprocess.call(['git', 'clone', clone_url, directory])
