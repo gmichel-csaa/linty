@@ -7,19 +7,20 @@ from interface.utils import get_github
 class Repo(models.Model):
     user = models.ForeignKey(User, related_name='repos')
     full_name = models.TextField()
-    webhook_id = models.IntegerField()
+    webhook_id = models.IntegerField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def get_head_build(self):
         return Build.objects.filter(repo=self, ref='master').only('status').first()
 
-    def delete(self, using=None, keep_parents=False):
+    def soft_delete(self):
         g = get_github(self.user)
         hook = g.get_repo(self.full_name).get_hook(self.webhook_id)
         hook.delete()
 
-        super(Repo, self).delete(using=using, keep_parents=keep_parents)
+        self.webhook_id = None
+        self.save()
 
     class Meta:
         ordering = ['full_name']
