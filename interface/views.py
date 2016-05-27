@@ -100,9 +100,9 @@ def ProcessRepo(request, full_name):
         active=True
     )
 
-    Repo.objects.create(full_name=grepo.full_name, user=user, webhook_id=hook.id)
+    repo = Repo.objects.create(full_name=grepo.full_name, user=user, webhook_id=hook.id)
 
-    url = reverse('repo_detail', kwargs={'full_name': grepo.full_name})
+    url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
 
 
