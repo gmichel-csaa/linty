@@ -1,5 +1,8 @@
 {% load humanize %}
 
+<a href="{% url 'repo_list' %}">Back to Repos</a> |
+<a href="{% url 'repo_detail' full_name=object.repo.full_name %}">Back to Repo</a>
+
 <h2>{{ object.repo.full_name }} : {{ object.sha }}</h2>
 
 <ul>
