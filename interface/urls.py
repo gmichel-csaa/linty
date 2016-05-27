@@ -1,8 +1,10 @@
 from django.conf.urls import url
+from django.views.generic import TemplateView
 
 from interface import views
 
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='interface/index.html'), name='index'),
     url(r'^add/(?P<full_name>(.*))$', views.ProcessRepo, name='process_repo'),
     url(r'^repos$', views.RepoListView.as_view(), name='repo_list'),
     url(

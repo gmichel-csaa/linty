@@ -1,19 +1,26 @@
 {% load humanize %}
 
-Badge Markdown:
-<input type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-<img src="{{ badge_url }}" />
+<a href="{% url 'repo_list' %}">Back to Repos</a>
 
+<h2>{{ object.full_name }}</h2>
+
+<a href="{% url 'delete_repo' full_name=object.full_name %}">Stop Linting this Repo</a>
+
+<p>
+    <label>
+        Badge (Markdown):
+        <input name="badge" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+    </label>
+    <img src="{{ badge_url }}" />
+</p>
+
+<h3>Builds</h3>
 <ul>
     {% for build in builds %}
         <li>
-            {% if build.status == 'error' %}
             <a href="{% url 'build_detail' pk=build.pk %}">
                 {{ build.sha|slice:":6" }}: {{ build.ref }} - {{ build.status }} - {{ build.created_at|naturaltime }}
             </a>
-            {% else %}
-                {{ build.sha|slice:":6" }}: {{ build.ref }} - {{ build.status }} - {{ build.created_at|naturaltime }}
-            {% endif %}
         </li>
     {% endfor %}
 </ul>

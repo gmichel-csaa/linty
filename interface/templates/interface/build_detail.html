@@ -1,1 +1,15 @@
-<textarea readonly style="height: 500px; width: 500px;">{{ object.result }}</textarea>
+{% load humanize %}
+
+<h2>{{ object.repo.full_name }} : {{ object.sha }}</h2>
+
+<ul>
+    <li>Branch: {{ object.ref }}</li>
+    <li>Status: {{ object.status }}</li>
+    <li>Time: {{ object.created_at|naturaltime }}</li>
+</ul>
+
+<label>
+    Results
+    <br/>
+    <textarea readonly style="height: 500px; width: 500px;">{{ object.result|default_if_none:"" }}</textarea>
+</label>
