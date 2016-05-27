@@ -6,11 +6,13 @@
 
 <a href="{% url 'delete_repo' full_name=object.full_name %}">Stop Linting this Repo</a>
 
-<label>
-    Badge (Markdown):
-    <input name="badge" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-</label>
-<img src="{{ badge_url }}" />
+<p>
+    <label>
+        Badge (Markdown):
+        <input name="badge" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+    </label>
+    <img src="{{ badge_url }}" />
+</p>
 
 <h3>Builds</h3>
 <ul>
