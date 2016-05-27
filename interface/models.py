@@ -11,6 +11,9 @@ class Repo(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_head_build(self):
+        return Build.objects.filter(repo=self, ref='master').only('status').first()
+
     def delete(self, using=None, keep_parents=False):
         g = get_github(self.user)
         hook = g.get_repo(self.full_name).get_hook(self.webhook_id)

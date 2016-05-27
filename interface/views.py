@@ -10,15 +10,15 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from social.apps.django_app.default.models import UserSocialAuth
 
 from interface.models import Build, Repo
 from interface.utils import get_github
 
 
-class BuildDetailView(generic.DetailView, LoginRequiredMixin):
+class BuildDetailView(LoginRequiredMixin, generic.DetailView):
     model = Build
 
     def get(self, request, *args, **kwargs):
@@ -30,18 +30,28 @@ class BuildDetailView(generic.DetailView, LoginRequiredMixin):
         return super(BuildDetailView, self).get(request, *args, **kwargs)
 
 
-class BuildListView(generic.ListView, LoginRequiredMixin):
-    model = Build
+class RepoDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Repo
+    slug_field = 'full_name'
+    slug_url_kwarg = 'full_name'
 
-    def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        return Build.objects.filter(
-            repo__pk=pk,
-            repo__user=self.request.user
-        )
+    def get_context_data(self, **kwargs):
+        object = self.object
+        url = reverse('badge', kwargs={'full_name': object.full_name})
+
+        kwargs['builds'] = Build.objects.filter(repo=object)
+        kwargs['badge_url'] = self.request.build_absolute_uri(url)
+
+        return super(RepoDetailView, self).get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+        if object.user != request.user:
+            return HttpResponse(status=403)
+        return super(RepoDetailView, self).get(request, *args, **kwargs)
 
 
-class RepoListView(generic.ListView, LoginRequiredMixin):
+class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
 
     def get_queryset(self):
@@ -59,12 +69,15 @@ class RepoListView(generic.ListView, LoginRequiredMixin):
                 filtered.append(repo)
 
         kwargs['repos'] = filtered
+
         return super(RepoListView, self).get_context_data(**kwargs)
 
 
-class RepoDeleteView(generic.DeleteView, LoginRequiredMixin):
+class RepoDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy('repo_list')
     model = Repo
+    slug_field = 'full_name'
+    slug_url_kwarg = 'full_name'
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -185,3 +198,19 @@ def WebhookView(request):
     build.save()
 
     return HttpResponse(status=204)
+
+
+class BadgeView(generic.DetailView):
+    model = Repo
+    slug_field = 'full_name'
+    slug_url_kwarg = 'full_name'
+
+    def get_template_names(self):
+        repo = self.object
+        build = repo.get_head_build()
+        if build:
+            if build.status == 'success':
+                return ['interface/badges/pass.svg']
+            elif build.status == 'error':
+                return ['interface/badges/fail.svg']
+        return ['interface/badges/unknown.svg']

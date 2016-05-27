@@ -1,5 +1,9 @@
 {% load humanize %}
 
+Badge Markdown:
+<input type="text" readonly value="[![Linty]({{ badge_url }})]({{ request.path }})">
+<object data="{{ badge_url }}" type="image/svg+xml"></object>
+
 <ul>
     {% for build in object_list %}
         <li>
