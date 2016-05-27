@@ -174,15 +174,14 @@ def WebhookView(request):
     else:
         status = 'error'
         output = output.replace(directory, '')
+        path = reverse('build_detail', kwargs={'pk': build.id})
+        url = request.build_absolute_uri(path)
+        publish_status(status, 'Your code has pep8 violations.', target_url=url)
 
     # save record
     build.status = status
     build.result = output
     build.finished_at = timezone.now()
     build.save()
-
-    path = reverse('build_detail', kwargs={'pk': build.id})
-    url = request.build_absolute_uri(path)
-    publish_status('error', 'Your code has pep8 violations.', target_url=url)
 
     return HttpResponse(status=204)
