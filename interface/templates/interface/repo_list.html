@@ -2,7 +2,10 @@
 <h2>Registered Repos</h2>
 <ul>
 {% for obj in object_list %}
-<li><a href="{% url 'build_list' pk=obj.pk %}">{{ obj.full_name }}</a> [<a href="{% url 'delete_repo' pk=obj.pk %}">DELETE</a>]</li>
+<li>
+    <a href="{% url 'repo_detail' full_name=obj.full_name %}">{{ obj.full_name }}</a>
+    [<a href="{% url 'delete_repo' full_name=obj.full_name %}">DELETE</a>]
+</li>
 {% endfor %}
 </ul>
 
