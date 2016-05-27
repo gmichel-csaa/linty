@@ -10,8 +10,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from social.apps.django_app.default.models import UserSocialAuth
 
 from interface.models import Build, Repo
@@ -185,3 +185,19 @@ def WebhookView(request):
     build.save()
 
     return HttpResponse(status=204)
+
+
+class BadgeView(generic.DetailView):
+    model = Repo
+    slug_field = 'full_name'
+    slug_url_kwarg = 'full_name'
+
+    def get_template_names(self):
+        repo = self.object
+        build = Build.objects.filter(repo=repo, ref='master').only('status').first()
+        if build:
+            if build.status == 'success':
+                return ['interface/badges/pass.svg']
+            elif build.status == 'error':
+                return ['interface/badges/fail.svg']
+        return ['interface/badges/unknown.svg']

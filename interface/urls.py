@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^repos$', views.RepoListView.as_view(), name='repo_list'),
     url(r'^repo/(?P<pk>[0-9]+)/builds$', views.BuildListView.as_view(), name='build_list'),
     url(r'^repo/(?P<pk>[0-9]+)/delete$', views.RepoDeleteView.as_view(), name='delete_repo'),
+    url(r'^repo/(?P<full_name>.*)/badge.svg$', views.BadgeView.as_view(), name='badge'),
     url(r'^build/(?P<pk>[0-9]+)$', views.BuildDetailView.as_view(), name='build_detail'),
     url(r'^webhook$', views.WebhookView, name='webhook')
 ]
