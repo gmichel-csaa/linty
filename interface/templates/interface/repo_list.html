@@ -1,23 +1,42 @@
-<ul>
-    <li><a href="{% url 'logout' %}">Log out</a></li>
-</ul>
+{% extends 'base.html' %}
 
-<h2>Registered Repos</h2>
-<ul>
-{% for obj in object_list %}
-<li>
-    <a href="{% url 'repo_detail' full_name=obj.full_name %}">{{ obj.full_name }}</a>
-    [<a href="{% url 'repo_delete' full_name=obj.full_name %}">Stop linting</a>]
-</li>
-{% endfor %}
-</ul>
+{% block body %}
+    <div class="ui main text container">
+        <div class="ui text menu">
+            <div class="ui item">
+              <h1 class="ui header">Dashboard</h1>
+            </div>
+            <div class="ui right dropdown item">
+                {{ user.username }}
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+                </div>
+            </div>
+        </div>
+        <h2 class="ui header">Registered Repos</h2>
+        <div class="ui large middle aligned divided selection list">
+            {% for obj in object_list %}
+            <a class="item" href="{% url 'repo_detail' full_name=obj.full_name %}">
+                <div class="content">
+                    <span>{{ obj.full_name }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
 
-<h2>Available Repos</h2>
-<ul>
-    {% for obj in repos %}
-    <li>
-        {{ obj.full_name }}
-        [<a href="{% url 'process_repo' full_name=obj.full_name %}">Lint this repo</a>]
-    </li>
-    {% endfor %}
-</ul>
+        <h2 class="ui header">Available Repos</h2>
+        <div class="ui large middle aligned divided selection list">
+            {% for obj in repos %}
+            <a class="item" href="{% url 'process_repo' full_name=obj.full_name %}">
+                <div class="right floated content">
+                    <div class="ui primary button">Start Linting</div>
+                </div>
+                <div class="content">
+                    <span>{{ obj.full_name }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

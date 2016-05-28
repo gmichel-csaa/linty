@@ -1,36 +1,123 @@
+{% extends 'base.html' %}
 {% load humanize %}
 
-<ul>
-    {% if user.is_authenticated %}
-    <li><a href="{% url 'logout' %}{% if not object.is_private or owner %}?next={{ request.path }}{% endif %}">Log out</a></li>
-    <li><a href="{% url 'repo_list' %}">Back to Repos</a></li>
-    {% else %}
-    <li><a href="{% url 'login' %}">Log in</a></li>
-    {% endif %}
-</ul>
+{% block body %}
+    <div class="ui main text container">
+        <div class="ui text menu">
+            <div class="ui item">
+                <div class="ui large breadcrumb">
+                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                    <i class="right chevron icon divider"></i>
+                    <div class="active section">{{ object.full_name }}</div>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="ui right dropdown item">
+                {{ user.username }}
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="{% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="ui right item">
+                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
+            </div>
+            {% endif %}
+        </div>
 
-<h2>{{ object.full_name }}</h2>
+        {% if owner %}
+        <div class="ui text menu">
+            <div class="ui item">
+                <img class="linty-badge" src="{{ badge_url }}"/>
+                <div class="ui action input">
+                  <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+                  <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input">
+                    <i class="copy icon"></i>
+                  </button>
+                </div>
+            </div>
+            <div class="ui right item">
+                <a class="ui red button" href="{% url 'repo_delete' full_name=object.full_name %}">
+                    Stop Linting this Repo
+                </a>
+            </div>
+        </div>
+        {% endif %}
 
-{% if owner %}
-<a href="{% url 'repo_delete' full_name=object.full_name %}">Stop Linting this Repo</a>
-
-<p>
-    <label>
-        Badge (Markdown):
-        <input name="badge" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-    </label>
-    <img src="{{ badge_url }}" />
-</p>
-
-{% endif %}
-
-<h3>Builds</h3>
-<ul>
-    {% for build in builds %}
-        <li>
-            <a href="{% url 'build_detail' pk=build.pk %}">
-                {{ build.short_sha }}: {{ build.ref }} - {{ build.status }} - {{ build.created_at|naturaltime }}
+        <h2 class="ui header">Builds</h2>
+        <table class="ui very basic selectable table">
+            <thead>
+                <tr>
+                    <td>Status</td>
+                    <td>Branch</td>
+                    <td>SHA</td>
+                    <td>Time</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for build in builds %}
+                <tr>
+                    <td>
+                        <div class="ui text {% if build.status == 'success' %}green{% else %}red{% endif %}">
+                            <i class="large icon {% if build.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+                            {{ build.status }}
+                        </div>
+                    </td>
+                    <td>
+                        <a href="{% url 'build_detail' pk=build.pk %}">{{ build.ref }}</a>
+                    </td>
+                    <td>
+                        <i class="github middle aligned icon"></i>
+                        {{ build.short_sha }}
+                    </td>
+                    <td>{{ build.created_at|naturaltime }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% for build in builds %}
+            <a class="item" href="{% url 'build_detail' pk=build.pk %}">
+                <div class="content">
+                    <span>{{ obj.full_name }}</span>
+                </div>
             </a>
-        </li>
-    {% endfor %}
-</ul>
+        {% endfor %}
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script type="text/javascript">
+        var copyButton = new Clipboard('.copy_button');
+        var btns=document.querySelectorAll('.copy_button');
+        for(var i=0;i<btns.length;i++){
+            btns[i].addEventListener('mouseleave',function(e){
+                e.currentTarget.setAttribute('class','ui teal right icon button copy_button');
+                e.currentTarget.removeAttribute('aria-label');
+            });
+        }
+        function showTooltip(elem,msg){
+            elem.setAttribute('class','ui teal right icon button copy_button tooltipped tooltipped-s');
+            elem.setAttribute('aria-label',msg);
+        }
+        function fallbackMessage(action){
+            var actionMsg='';
+            var actionKey=(action==='cut'?'X':'C');
+            if(/iPhone|iPad/i.test(navigator.userAgent)){
+                actionMsg='No support :(';
+            }
+            else if(/Mac/i.test(navigator.userAgent)){
+                actionMsg='Press ⌘-'+ actionKey+' to '+ action;
+            }
+            else{
+                actionMsg='Press Ctrl-'+ actionKey+' to '+ action;
+            }
+            return actionMsg;
+        }
+        copyButton.on('success',function(e){
+            e.clearSelection();
+            showTooltip(e.trigger,'Copied!');
+        });
+        copyButton.on('error',function(e){
+            showTooltip(e.trigger,fallbackMessage(e.action));
+        });
+    </script>
+{% endblock %}

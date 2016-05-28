@@ -26,7 +26,7 @@ class BuildDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         object = self.object
         kwargs['repo'] = object.repo
-        kwargs['owner'] = self.request.user == kwargs['repo'].user
+        kwargs['is_owner'] = self.request.user == kwargs['repo'].user
         return super(BuildDetailView, self).get_context_data(**kwargs)
 
 

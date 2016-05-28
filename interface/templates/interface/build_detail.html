@@ -1,27 +1,69 @@
+{% extends 'base.html' %}
 {% load humanize %}
+{% load staticfiles %}
 
-<ul>
-    {% if user.is_authenticated %}
-    <li><a href="{% url 'logout' %}{% if not object.repo.is_private or owner %}?next={{ request.path }}{% endif %}">Log out</a></li>
-    <li><a href="{% url 'repo_list' %}">Back to Repos</a></li>
-    {% else %}
-    <li><a href="{% url 'login' %}">Log in</a></li>
-    {% endif %}
-    {% if not repo.is_private or owner %}
-    <li><a href="{% url 'repo_detail' full_name=repo.full_name %}">Back to Repo</a></li>
-    {% endif %}
-</ul>
+{% block body %}
+    <div class="ui main text container">
+        <div class="ui text menu">
+            <div class="ui item">
+                <div class="ui large breadcrumb">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                        {% if not repo.is_private or is_owner %}
+                            <i class="right chevron icon divider"></i>
+                            <a href="{% url 'repo_detail' full_name=repo.full_name %}" class="section">
+                                {{ repo.full_name }}
+                            </a>
+                        {% endif %}
+                        <i class="right chevron icon divider"></i>
+                    {% endif %}
+                    <div class="active section">{{ object.ref }} : {{ object.short_sha }}</div>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="ui right dropdown item">
+                {{ user.username }}
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="ui right item">
+                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
+            </div>
+            {% endif %}
+        </div>
 
-<h2>{{ object.repo.full_name }} : {{ object.short_sha }}</h2>
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <div class="ui text {% if object.status == 'success' %}green{% else %}red{% endif %}">
+                    <i class="large icon {% if object.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+                    {{ object.status }}
+                </div>
+            </div>
+            <div class="ui segment">
+                <i class="large icon fork"></i>
+                {{ object.ref }}
+            </div>
+            <div class="ui segment">
+                <i class="large icon clock"></i>
+                {{ object.created_at|naturaltime }}
+            </div>
+        </div>
 
-<ul>
-    <li>Branch: {{ object.ref }}</li>
-    <li>Status: {{ object.status }}</li>
-    <li>Time: {{ object.created_at|naturaltime }}</li>
-</ul>
-
-<label>
-    Results
-    <br/>
-    <textarea readonly style="height: 500px; width: 500px;">{{ object.result|default_if_none:"" }}</textarea>
-</label>
+        <div class="ui styled fluid accordion">
+            <div class="title {{ object.result|yesno:"active," }}">
+                <i class="dropdown icon"></i>
+                PEP 8
+            </div>
+            <div class="content {{ object.result|yesno:"active," }}">
+                <div class="ui form transition {{ object.result|yesno:",hidden" }}">
+                    <div class="field">
+                        <textarea readonly>{{ object.result|default_if_none:"" }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
