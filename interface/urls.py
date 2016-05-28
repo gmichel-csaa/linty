@@ -15,5 +15,7 @@ urlpatterns = [
     url(r'^repo/(?P<full_name>[\w/-]+)/delete$', views.RepoDeleteView.as_view(), name='delete_repo'),
     url(r'^repo/(?P<full_name>[\w/-]+)$', views.RepoDetailView.as_view(), name='repo_detail'),
     url(r'^build/(?P<pk>[0-9]+)$', views.BuildDetailView.as_view(), name='build_detail'),
-    url(r'^webhook$', views.WebhookView, name='webhook')
+    url(r'^webhook$', views.WebhookView, name='webhook'),
+    url(r'^logout', views.LogoutView, name='logout'),
+    url(r'^login', views.LoginView, name='login')
 ]

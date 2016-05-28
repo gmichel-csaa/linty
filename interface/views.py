@@ -4,15 +4,17 @@ import shutil
 import subprocess
 
 import requests
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from social.apps.django_app.default.models import UserSocialAuth
+from social.apps.django_app.views import auth
 
 from interface.models import Build, Repo
 from interface.utils import get_github
@@ -222,3 +224,13 @@ class BadgeView(generic.DetailView):
             elif build.status == 'error':
                 return ['interface/badges/fail.svg']
         return ['interface/badges/unknown.svg']
+
+
+def LoginView(request):
+    return auth(request, 'github')
+
+
+def LogoutView(request):
+    next = request.GET.get('next', '/')
+    logout(request)
+    return redirect(next)

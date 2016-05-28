@@ -1,6 +1,8 @@
 {% load humanize %}
-
-<a href="{% url 'repo_list' %}">Back to Repos</a>
+<ul>
+    <li><a href="{% url 'logout' %}">Log out</a></li>
+    <li><a href="{% url 'repo_list' %}">Back to Repos</a></li>
+</ul>
 
 <h2>{{ object.full_name }}</h2>
 
