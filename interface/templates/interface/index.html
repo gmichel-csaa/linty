@@ -2,6 +2,12 @@
 <head></head>
 <body>
 
+{% if user.is_authenticated %}
+<ul>
+    <li><a href="{% url 'repo_list' %}">Go to Repos</a></li>
+</ul>
+{% endif %}
+
 <h1>Linty</h1>
 
 <p>
@@ -16,7 +22,7 @@ Features:
     <li>Pass/Fail Badges for your READMEs</li>
 </ul>
 
-<p>To get started, <a href="/login/github">Log in with Github</a></p>
+<p>To get started, <a href="{% url 'login' %}">Log in with Github</a></p>
 
 </body>
 </html>
