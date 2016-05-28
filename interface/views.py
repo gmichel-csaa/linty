@@ -22,7 +22,7 @@ class BuildDetailView(generic.DetailView):
     model = Build
 
 
-class RepoDetailView(LoginRequiredMixin, generic.DetailView):
+class RepoDetailView(generic.DetailView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
@@ -31,6 +31,7 @@ class RepoDetailView(LoginRequiredMixin, generic.DetailView):
         object = self.object
         url = reverse('badge', kwargs={'full_name': object.full_name})
 
+        kwargs['owner'] = self.request.user == object.user
         kwargs['absolute_url'] = self.request.build_absolute_uri(self.request.path)
         kwargs['builds'] = Build.objects.filter(repo=object)
         kwargs['badge_url'] = self.request.build_absolute_uri(url)
@@ -39,8 +40,13 @@ class RepoDetailView(LoginRequiredMixin, generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         object = self.get_object()
-        if object.user != request.user:
+
+        if object.is_private and not request.user.is_authenticated():
+            return redirect(reverse('social:begin', kwargs={'backend': 'github'}))
+
+        if object.is_private and object.user != request.user:
             return HttpResponse(status=403)
+
         return super(RepoDetailView, self).get(request, *args, **kwargs)
 
 
@@ -88,7 +94,6 @@ def ProcessRepo(request, full_name):
     g = get_github(user)
 
     grepo = g.get_repo(full_name)
-
     hook = grepo.create_hook(
         'web',
         {
@@ -102,6 +107,7 @@ def ProcessRepo(request, full_name):
     repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     repo.webhook_id = hook.id
+    repo.private = grepo.private
     repo.save()
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})

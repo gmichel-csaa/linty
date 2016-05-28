@@ -8,6 +8,7 @@ class Repo(models.Model):
     user = models.ForeignKey(User, related_name='repos')
     full_name = models.TextField()
     webhook_id = models.IntegerField(null=True, blank=True)
+    is_private = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
