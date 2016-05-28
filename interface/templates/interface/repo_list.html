@@ -7,7 +7,7 @@
 {% for obj in object_list %}
 <li>
     <a href="{% url 'repo_detail' full_name=obj.full_name %}">{{ obj.full_name }}</a>
-    [<a href="{% url 'delete_repo' full_name=obj.full_name %}">Stop linting</a>]
+    [<a href="{% url 'repo_delete' full_name=obj.full_name %}">Stop linting</a>]
 </li>
 {% endfor %}
 </ul>
