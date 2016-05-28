@@ -1,28 +1,125 @@
 <html>
-<head></head>
+<head>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+  <style type="text/css">
+    .hidden.menu {
+      display: none;
+    }
+
+    .masthead.segment {
+      min-height: 100vh;
+      padding: 1em 0em;
+    }
+    .masthead .logo.item img {
+      margin-right: 1em;
+    }
+    .masthead .ui.menu .ui.button {
+      margin-left: 0.5em;
+    }
+    .masthead h1.ui.header {
+      margin-top: 3em;
+      margin-bottom: 0em;
+      font-size: 4em;
+      font-weight: normal;
+    }
+    .masthead h2 {
+      font-size: 1.7em;
+      font-weight: normal;
+    }
+
+    .ui.vertical.stripe {
+      padding: 8em 0em;
+    }
+    .ui.vertical.stripe h3 {
+      font-size: 2em;
+    }
+    .ui.vertical.stripe .button + h3,
+    .ui.vertical.stripe p + h3 {
+      margin-top: 3em;
+    }
+    .ui.vertical.stripe .floated.image {
+      clear: both;
+    }
+    .ui.vertical.stripe p {
+      font-size: 1.33em;
+    }
+    .ui.vertical.stripe .horizontal.divider {
+      margin: 3em 0em;
+    }
+
+    .quote.stripe.segment {
+      padding: 0em;
+    }
+    .quote.stripe.segment .grid .column {
+      padding-top: 5em;
+      padding-bottom: 5em;
+    }
+
+    .footer.segment {
+      padding: 5em 0em;
+    }
+
+    .secondary.pointing.menu .toc.item {
+      display: none;
+    }
+
+    @media only screen and (max-width: 700px) {
+      .ui.fixed.menu {
+        display: none !important;
+      }
+      .secondary.pointing.menu .item,
+      .secondary.pointing.menu .menu {
+        display: none;
+      }
+      .secondary.pointing.menu .toc.item {
+        display: block;
+      }
+      .masthead.segment {
+        min-height: 350px;
+      }
+      .masthead h1.ui.header {
+        font-size: 2em;
+        margin-top: 1.5em;
+      }
+      .masthead h2 {
+        margin-top: 0.5em;
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
 <body>
+  <div class="pusher">
+    <div class="ui inverted vertical masthead center aligned segment">
+      <div class="ui text container">
+        <h1 class="ui inverted header">Linty</h1>
+        <h2>Linting as a Service</h2>
+        <br>
+        <a class="ui huge primary button" href="/login/github">Connect With Github <i class="right arrow icon"></i></a>
+      </div>
+    </div>
 
-{% if user.is_authenticated %}
-<ul>
-    <li><a href="{% url 'repo_list' %}">Go to Repos</a></li>
-</ul>
-{% endif %}
-
-<h1>Linty</h1>
-
-<p>
-Linty is Linting as a Service. Users can sign in with Github, select a repo, and immediately get linting for their code.
-</p>
-
-Features:
-<ul>
-    <li>One click repo registration/de-registration</li>
-    <li>Pass/fail statuses on Pull Requests</li>
-    <li>History of lint results</li>
-    <li>Pass/Fail Badges for your READMEs</li>
-</ul>
-
-<p>To get started, <a href="{% url 'login' %}">Log in with Github</a></p>
-
+    <div class="ui vertical stripe segment">
+      <div class="ui middle aligned stackable grid container">
+        <div class="row">
+          <div class="eight wide column">
+            <h3 class="ui header">Simple to set up</h3>
+            <p>Users can sign in with Github, select a repo, insert your Linty badge, and immediately get linting for their code.</p>
+            <h3 class="ui header">All the features you expect</h3>
+            <p>From pass/fail statuses on Pull Requests to linting history, Linty has all the features you depend on from competing services.</p>
+          </div>
+          <div class="six wide right floated column">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1024px-Python-logo-notext.svg.png" class="ui large rounded image">
+          </div>
+        </div>
+        <div class="row">
+          <div class="center aligned column">
+            <a class="ui huge primary button" href="/login/github">Connect with Github</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
 </body>
 </html>
