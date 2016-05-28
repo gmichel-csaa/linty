@@ -52,11 +52,5 @@ class Build(models.Model):
     def short_sha(self):
         return self.sha[:7]
 
-    def get_duration(self):
-        delta = self.finished_at - self.created_at
-        s = delta.seconds
-        minutes, seconds = divmod(s, 60)
-        return '%sm:%ss' % (minutes, seconds)
-
     class Meta:
         ordering = ['-created_at']

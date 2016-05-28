@@ -1,33 +1,147 @@
-import json
-
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from interface.models import Result
+from interface.models import Repo, Build
 
 
-class ResultTests(TestCase):
+class LintTestCase(TestCase):
     def setUp(self):
-        self.result = Result.objects.create(text='Hello world')
+        self.user = User.objects.create(
+            username='test',
+            password='test'
+        )
+        self.repo = Repo.objects.create(
+            user=self.user,
+            full_name='Test/Test',
+            is_private=True,
+            webhook_id=1,
+        )
+        self.build = Build.objects.create(
+            repo=self.repo,
+            ref='master',
+            sha='2278cd53905d74f01d2ec5bae3cf136ad66e7393',
+            status=Build.ERROR,
+            result='/interface/views.py:34:1: E303 too many blank lines (3)'
+        )
 
-    def test_get_result_detail_200(self):
-        url = reverse('result_detail', kwargs={'pk': self.result.id})
-        response = self.client.get(url)
+
+class HomePageTests(LintTestCase):
+    def test_home_unauth_200(self):
+        response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
-    def test_get_result_detail_404(self):
-        url = reverse('result_detail', kwargs={'pk': self.result.id+1})
+    def test_home_auth_200(self):
+        self.client.force_login(self.user)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+
+class RepoListTests(LintTestCase):
+    def setUp(self):
+        super(RepoListTests, self).setUp()
+        self.url = reverse('repo_list')
+
+    def test_repo_list_unauth_302(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    # Disabled because the view requires OAuth with Github
+    # def test_repo_list_auth_200(self):
+    #     self.client.force_login(self.user)
+    #     response = self.client.get(self.url)
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertContains(response, self.repo.full_name)
+
+
+class RepoDetailTests(LintTestCase):
+    def setUp(self):
+        super(RepoDetailTests, self).setUp()
+        self.url = reverse('repo_detail', kwargs={'full_name': self.repo.full_name})
+
+    def test_repo_detail_404(self):
+        url = reverse('repo_detail', kwargs={'full_name': 'Test/404'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_repo_detail_private_unauth_302(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
 
-class WebhookTests(TestCase):
+    def test_repo_list_auth_200(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.repo.full_name)
+        self.assertContains(response, self.build.id)
+
+
+class RepoDeleteTests(LintTestCase):
     def setUp(self):
-        # TODO: Write dummy webhook
-        self.data = json.dumps({'test': 'test'})
+        super(RepoDeleteTests, self).setUp()
+        self.url = reverse('repo_delete', kwargs={'full_name': self.repo.full_name})
 
-    def test_post_webhook_204(self):
-        # TODO: use vcr for requests
-        url = reverse('webhook')
-        response = self.client.post(url, data=self.data, content_type='application/json')
-        self.assertEqual(response.status_code, 204)
+    def test_repo_delete_404(self):
+        url = reverse('repo_delete', kwargs={'full_name': 'Test/404'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_repo_delete_unauth_302(self):
+        response = self.client.get(self.url)
+        self.assertIsNotNone(self.repo.webhook_id)
+        self.assertEqual(response.status_code, 302)
+
+    # Disabled because requires OAuth
+    # def test_repo_delete_auth_302(self):
+    #     self.client.force_login(self.user)
+    #     response = self.client.get(self.url)
+    #     self.assertIsNone(self.repo.webhook_id)
+    #     self.assertEqual(response.status_code, 302)
+
+
+class BuildDetailTests(LintTestCase):
+    def setUp(self):
+        super(BuildDetailTests, self).setUp()
+        self.url = reverse('build_detail', kwargs={'pk': self.build.pk})
+
+    def test_build_detail_404(self):
+        url = reverse('build_detail', kwargs={'pk': 999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_build_detail_public_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_build_detail_owner_200(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+
+class BadgeTests(LintTestCase):
+    def setUp(self):
+        super(BadgeTests, self).setUp()
+        self.url = reverse('badge', kwargs={'full_name': self.repo.full_name})
+
+    def test_badge_unknown_200(self):
+        self.build.status = Build.PENDING
+        self.build.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'image/svg+xml')
+        self.assertIn('interface/badges/unknown.svg', response.template_name)
+
+    def test_badge_fail_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'image/svg+xml')
+        self.assertIn('interface/badges/fail.svg', response.template_name)
+
+    def test_badge_pass_200(self):
+        self.build.status = Build.SUCCESS
+        self.build.save()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'image/svg+xml')
+        self.assertIn('interface/badges/pass.svg', response.template_name)

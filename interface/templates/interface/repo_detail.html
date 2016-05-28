@@ -12,7 +12,7 @@
 <h2>{{ object.full_name }}</h2>
 
 {% if owner %}
-<a href="{% url 'delete_repo' full_name=object.full_name %}">Stop Linting this Repo</a>
+<a href="{% url 'repo_delete' full_name=object.full_name %}">Stop Linting this Repo</a>
 
 <p>
     <label>
