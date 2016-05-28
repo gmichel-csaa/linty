@@ -4,6 +4,7 @@
 
 <h2>{{ object.full_name }}</h2>
 
+{% if owner %}
 <a href="{% url 'delete_repo' full_name=object.full_name %}">Stop Linting this Repo</a>
 
 <p>
@@ -13,6 +14,8 @@
     </label>
     <img src="{{ badge_url }}" />
 </p>
+
+{% endif %}
 
 <h3>Builds</h3>
 <ul>
