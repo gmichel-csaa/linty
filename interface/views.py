@@ -23,6 +23,12 @@ from interface.utils import get_github
 class BuildDetailView(generic.DetailView):
     model = Build
 
+    def get_context_data(self, **kwargs):
+        object = self.object
+        kwargs['repo'] = object.repo
+        kwargs['owner'] = self.request.user == kwargs['repo'].user
+        return super(BuildDetailView, self).get_context_data(**kwargs)
+
 
 class RepoDetailView(generic.DetailView):
     model = Repo
