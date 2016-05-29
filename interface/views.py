@@ -160,7 +160,7 @@ def WebhookView(request):
     except ValueError:
         return HttpResponse('Invalid JSON body.', status=400)
 
-    if 'ref' not in body or 'compare' in body:
+    if 'ref' not in body or not body['head_commit']:
         return HttpResponse(status=204)
 
     try:
@@ -181,9 +181,6 @@ def WebhookView(request):
     clone_url = body['repository']['clone_url']
     clone_url = clone_url.replace('github.com', '%s:%s@github.com' % (username, password))
     branch = body['ref'].replace('refs/heads/', '')
-
-    if 'head_commit' not in body:
-        return HttpResponse(status=204)
 
     sha = body['head_commit']['id']
     status_url = body['repository']['statuses_url'].replace('{sha}', sha)
