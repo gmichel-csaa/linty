@@ -9,11 +9,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
+from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
@@ -90,15 +92,29 @@ class RepoDeleteView(LoginRequiredMixin, generic.DetailView):
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(RepoDeleteView, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
 
         if obj.user != self.request.user:
-            return HttpResponse(status=403)
+            raise Http404
 
         obj.soft_delete()
 
         return redirect(reverse('repo_list'))
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        if obj.user != self.request.user:
+            raise Http404
+
+        obj.soft_delete()
+
+        return HttpResponse(status=204)
 
 
 @login_required
@@ -107,15 +123,19 @@ def ProcessRepo(request, full_name):
     g = get_github(user)
 
     grepo = g.get_repo(full_name)
-    hook = grepo.create_hook(
-        'web',
-        {
-            'content_type': 'json',
-            'url': request.build_absolute_uri(reverse('webhook'))
-        },
-        events=['push'],
-        active=True
-    )
+
+    try:
+        hook = grepo.create_hook(
+            'web',
+            {
+                'content_type': 'json',
+                'url': request.build_absolute_uri(reverse('webhook'))
+            },
+            events=['push'],
+            active=True
+        )
+    except UnknownObjectException:
+        raise Http404
 
     repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
