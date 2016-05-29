@@ -8,6 +8,15 @@
 .ui.text.green {
     color: #21ba45!important
 }
+.repo_link {
+    color: #2185d0!important;
+}
+.available_repo {
+    color: rgba(0,0,0,.4)!important;
+}
+.build_count {
+    font-size: 0.7em;
+}
 /* Tooltips */
 .tooltipped {
     position: relative;

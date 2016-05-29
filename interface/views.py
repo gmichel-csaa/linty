@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -62,7 +63,11 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
 
     def get_queryset(self):
-        return Repo.objects.filter(user=self.request.user, webhook_id__isnull=False)
+        repos = Repo.objects.filter(
+            user=self.request.user,
+            webhook_id__isnull=False
+        ).annotate(builds_count=Count('builds'))
+        return repos
 
     def get_context_data(self, **kwargs):
         queryset = kwargs.pop('object_list', self.object_list)

@@ -15,20 +15,24 @@
             </div>
         </div>
         <h2 class="ui header">Registered Repos</h2>
-        <div class="ui large middle aligned divided selection list">
+        <div class="ui large middle aligned divided relaxed selection list">
             {% for obj in object_list %}
-            <a class="item" href="{% url 'repo_detail' full_name=obj.full_name %}">
+            <a class="item repo_link" href="{% url 'repo_detail' full_name=obj.full_name %}">
+                <div class="right floated content">
+                    <div class="ui basic button">View Builds</div>
+                </div>
                 <div class="content">
-                    <span>{{ obj.full_name }}</span>
+                    <span class="header repo_link">{{ obj.full_name }}</span>
+                    <span class="description build_count">{{ obj.builds_count }} Build{{ obj.builds_count|pluralize }}</span>
                 </div>
             </a>
             {% endfor %}
         </div>
 
         <h2 class="ui header">Available Repos</h2>
-        <div class="ui large middle aligned divided selection list">
+        <div class="ui large divided relaxed selection list">
             {% for obj in repos %}
-            <a class="item" href="{% url 'process_repo' full_name=obj.full_name %}">
+            <a class="item available_repo" href="{% url 'process_repo' full_name=obj.full_name %}">
                 <div class="right floated content">
                     <div class="ui primary button">Start Linting</div>
                 </div>
