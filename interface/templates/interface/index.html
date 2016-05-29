@@ -1,28 +1,59 @@
+{% load staticfiles %}
+
 <html>
-<head></head>
+<head>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+</head>
 <body>
 
-{% if user.is_authenticated %}
-<ul>
-    <li><a href="{% url 'repo_list' %}">Go to Repos</a></li>
-</ul>
-{% endif %}
+<div class="pusher">
+    <div class="ui inverted vertical masthead center aligned segment">
+        {% if user.is_authenticated %}
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+              <a class="toc item">
+                  <i class="sidebar icon"></i>
+              </a>
+              <div class="right item">
+                  <a href="{% url 'repo_list' %}" class="ui inverted button">Dashboard</a>
+              </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="ui text container">
+            <h1 class="ui inverted header">Linty</h1>
+            <h2>Linting as a Service</h2>
+            <br>
+            <a class="ui huge primary button" href="/login/github">Connect With Github <i class="right arrow icon"></i></a>
+        </div>
+    </div>
 
-<h1>Linty</h1>
-
-<p>
-Linty is Linting as a Service. Users can sign in with Github, select a repo, and immediately get linting for their code.
-</p>
-
-Features:
-<ul>
-    <li>One click repo registration/de-registration</li>
-    <li>Pass/fail statuses on Pull Requests</li>
-    <li>History of lint results</li>
-    <li>Pass/Fail Badges for your READMEs</li>
-</ul>
-
-<p>To get started, <a href="{% url 'login' %}">Log in with Github</a></p>
-
+    <div class="ui vertical stripe segment">
+        <div class="ui middle aligned stackable grid container">
+            <div class="row">
+                <div class="eight wide column">
+                    <h3 class="ui header">Simple to set up</h3>
+                    <p>Users can sign in with Github, select a repo, insert your Linty badge, and immediately get
+                        linting for their code.</p>
+                    <h3 class="ui header">All the features you expect</h3>
+                    <p>From pass/fail statuses on Pull Requests to linting history, Linty has all the features you
+                        depend on from competing services.</p>
+                </div>
+                <div class="six wide right floated column">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1024px-Python-logo-notext.svg.png"
+                         class="ui large rounded image">
+                </div>
+            </div>
+            <div class="row">
+                <div class="center aligned column">
+                    <a class="ui huge primary button" href="/login/github">Connect with Github</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
 </body>
 </html>

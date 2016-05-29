@@ -40,7 +40,7 @@ class Build(models.Model):
         (CANCELLED, CANCELLED)
     )
 
-    repo = models.ForeignKey(Repo)
+    repo = models.ForeignKey(Repo, related_name='builds')
     ref = models.TextField()
     sha = models.TextField()
     status = models.TextField(choices=STATUS_CHOICES, default=PENDING)
