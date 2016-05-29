@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <html>
     <head>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% if DEBUG %}[DEBUG] {% endif %}{% block title %}{% endblock %}</title>
         <meta charset="UTF-8">
         <meta name="description" content="Free automated code linting">
         <meta name="keywords" content="code,lint,linty,pep8,eslint,ci">
