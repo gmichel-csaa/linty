@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
-from github import UnknownObjectException
+from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
@@ -69,12 +69,19 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
         ).annotate(builds_count=Count('builds'))
         return repos
 
-    def get_context_data(self, **kwargs):
-        queryset = kwargs.pop('object_list', self.object_list)
-        names = [x[0] for x in queryset.values_list('full_name')]
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        context = self.get_context_data()
+
+        names = [x[0] for x in self.object_list.values_list('full_name')]
         # Get list of user repos
         g = get_github(self.request.user)
-        repos = [r for r in g.get_user().get_repos()]
+        try:
+            repos = [r for r in g.get_user().get_repos()]
+        except BadCredentialsException:
+            UserSocialAuth.objects.filter(user=request.user).delete()
+            return redirect(reverse('login'))
+
         filtered = []
         for repo in repos:
             if repo.full_name not in names:
@@ -82,7 +89,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
 
         kwargs['repos'] = filtered
 
-        return super(RepoListView, self).get_context_data(**kwargs)
+        return self.render_to_response(context)
 
 
 class RepoDeleteView(generic.DetailView):
