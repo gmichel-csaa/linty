@@ -8,12 +8,13 @@
         <meta name="author" content="https://github.com/birkholz">
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
         <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js" ></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-rc1/jquery.min.js"></script>
     </head>
     <body>
     {% block body %}
     {% endblock %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-rc1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js" ></script>
     <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+    {% block extra_js %}{% endblock %}
     </body>
 </html>
