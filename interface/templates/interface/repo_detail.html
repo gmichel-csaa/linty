@@ -54,6 +54,7 @@
         {% endif %}
 
         <h2 class="ui header">Builds</h2>
+        {% if builds %}
         <table class="ui very basic selectable table">
             <thead>
             <tr>
@@ -84,13 +85,9 @@
             {% endfor %}
             </tbody>
         </table>
-        {% for build in builds %}
-            <a class="item" href="{% url 'build_detail' pk=build.pk %}">
-                <div class="content">
-                    <span>{{ obj.full_name }}</span>
-                </div>
-            </a>
-        {% endfor %}
+        {% else %}
+            <p>Builds will show here once you push commits to the repo.</p>
+        {% endif %}
     </div>
 
     <div id="stop_linting_modal" class="ui small basic modal">
