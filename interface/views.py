@@ -87,7 +87,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
             if repo.full_name not in names:
                 filtered.append(repo)
 
-        kwargs['repos'] = filtered
+        context['repos'] = filtered
 
         return self.render_to_response(context)
 
