@@ -64,9 +64,9 @@ class RepoDetailTests(LintTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_repo_detail_private_unauth_302(self):
+    def test_repo_detail_private_unauth_404(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
     def test_repo_list_auth_200(self):
         self.client.force_login(self.user)
@@ -84,12 +84,12 @@ class RepoDeleteTests(LintTestCase):
     def test_repo_delete_404(self):
         url = reverse('repo_delete', kwargs={'full_name': 'Test/404'})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
-    def test_repo_delete_unauth_302(self):
+    def test_repo_delete_unauth_404(self):
         response = self.client.get(self.url)
         self.assertIsNotNone(self.repo.webhook_id)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 404)
 
     # Disabled because requires OAuth
     # def test_repo_delete_auth_302(self):
@@ -110,8 +110,14 @@ class BuildDetailTests(LintTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_build_detail_public_200(self):
+        self.repo.is_private = False
+        self.repo.save()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_build_detail_private_uauth_404(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
 
     def test_build_detail_owner_200(self):
         self.client.force_login(self.user)

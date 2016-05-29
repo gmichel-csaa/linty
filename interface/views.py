@@ -85,7 +85,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
         return super(RepoListView, self).get_context_data(**kwargs)
 
 
-class RepoDeleteView(LoginRequiredMixin, generic.DetailView):
+class RepoDeleteView(generic.DetailView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
