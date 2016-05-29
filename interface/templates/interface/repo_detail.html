@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load staticfiles %}
 
 {% block title %}Linty - {{ object.full_name }}{% endblock %}
 
@@ -36,7 +37,7 @@
                 <img class="linty-badge" src="{{ badge_url }}"/>
                 <div class="ui action input">
                   <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-                  <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input">
+                  <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input" data-variation="inverted" data-position="top center">
                     <i class="copy icon"></i>
                   </button>
                 </div>
@@ -88,40 +89,9 @@
             </a>
         {% endfor %}
     </div>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
-    <script type="text/javascript">
-        var copyButton = new Clipboard('.copy_button');
-        var btns=document.querySelectorAll('.copy_button');
-        for(var i=0;i<btns.length;i++){
-            btns[i].addEventListener('mouseleave',function(e){
-                e.currentTarget.setAttribute('class','ui teal right icon button copy_button');
-                e.currentTarget.removeAttribute('aria-label');
-            });
-        }
-        function showTooltip(elem,msg){
-            elem.setAttribute('class','ui teal right icon button copy_button tooltipped tooltipped-s');
-            elem.setAttribute('aria-label',msg);
-        }
-        function fallbackMessage(action){
-            var actionMsg='';
-            var actionKey=(action==='cut'?'X':'C');
-            if(/iPhone|iPad/i.test(navigator.userAgent)){
-                actionMsg='No support :(';
-            }
-            else if(/Mac/i.test(navigator.userAgent)){
-                actionMsg='Press ⌘-'+ actionKey+' to '+ action;
-            }
-            else{
-                actionMsg='Press Ctrl-'+ actionKey+' to '+ action;
-            }
-            return actionMsg;
-        }
-        copyButton.on('success',function(e){
-            e.clearSelection();
-            showTooltip(e.trigger,'Copied!');
-        });
-        copyButton.on('error',function(e){
-            showTooltip(e.trigger,fallbackMessage(e.action));
-        });
-    </script>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+<script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}
