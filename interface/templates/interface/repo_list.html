@@ -46,3 +46,11 @@
         </div>
     </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    $('.available_repo').on('click', function(e){
+       $(this).find('.button').addClass('loading');
+    });
+</script>
+{% endblock %}

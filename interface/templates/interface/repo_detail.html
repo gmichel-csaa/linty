@@ -21,9 +21,7 @@
                     {{ user.username }}
                     <i class="dropdown icon"></i>
                     <div class="menu">
-                        <a href="
-
-                                {% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}"
+                        <a href="{% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}"
                            class="item">Log Out</a>
                     </div>
                 </div>
