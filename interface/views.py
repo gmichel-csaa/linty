@@ -1,9 +1,12 @@
+import hashlib
+import hmac
 import json
 import os
 import shutil
 import subprocess
 
 import requests
+from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -134,7 +137,8 @@ def ProcessRepo(request, full_name):
             'web',
             {
                 'content_type': 'json',
-                'url': request.build_absolute_uri(reverse('webhook'))
+                'url': request.build_absolute_uri(reverse('webhook')),
+                'secret': settings.WEBHOOK_SECRET
             },
             events=['push'],
             active=True
@@ -154,6 +158,17 @@ def ProcessRepo(request, full_name):
 
 @csrf_exempt
 def WebhookView(request):
+    if 'HTTP_X_HUB_SIGNATURE' not in request.META:
+        return HttpResponse(status=403)
+
+    sig = request.META['HTTP_X_HUB_SIGNATURE']
+    text = request.body
+
+    signature = 'sha1=' + hmac.new(settings.WEBHOOK_SECRET, msg=text, digestmod=hashlib.sha1).hexdigest()
+
+    if not hmac.compare_digest(sig, signature):
+        return HttpResponse(status=403)
+
     try:
         body = json.loads(request.body)
         assert body
