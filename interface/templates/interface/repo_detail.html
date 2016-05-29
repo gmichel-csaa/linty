@@ -10,58 +10,61 @@
             <div class="ui item">
                 <div class="ui large breadcrumb">
                     {% if user.is_authenticated %}
-                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
-                    <i class="right chevron icon divider"></i>
+                        <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                        <i class="right chevron icon divider"></i>
                     {% endif %}
                     <div class="active section">{{ object.full_name }}</div>
                 </div>
             </div>
             {% if user.is_authenticated %}
-            <div class="ui right dropdown item">
-                {{ user.username }}
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a href="{% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+                <div class="ui right dropdown item">
+                    {{ user.username }}
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a href="{% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}"
+                           class="item">Log Out</a>
+                    </div>
                 </div>
-            </div>
             {% else %}
-            <div class="ui right item">
-                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
-            </div>
+                <div class="ui right item">
+                    <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
+                </div>
             {% endif %}
         </div>
 
-        {% if owner %}
-        <div class="ui text menu">
-            <div class="ui item">
-                <img class="linty-badge" src="{{ badge_url }}"/>
-                <div class="ui action input">
-                  <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-                  <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input" data-variation="inverted" data-position="top center">
-                    <i class="copy icon"></i>
-                  </button>
+        {% if is_owner %}
+            <div class="ui text menu">
+                <div class="ui item">
+                    <img class="linty-badge" src="{{ badge_url }}"/>
+                    <div class="ui action input">
+                        <input id="badge_input" type="text" readonly
+                               value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+                        <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
+                                data-variation="inverted" data-position="top center">
+                            <i class="copy icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="ui right item">
+                    <div id="stop_linting" class="ui red button">
+                        Stop Linting this Repo
+                    </div>
                 </div>
             </div>
-            <div class="ui right item">
-                <a class="ui red button" href="{% url 'repo_delete' full_name=object.full_name %}">
-                    Stop Linting this Repo
-                </a>
-            </div>
-        </div>
         {% endif %}
 
         <h2 class="ui header">Builds</h2>
         <table class="ui very basic selectable table">
             <thead>
-                <tr>
-                    <td>Status</td>
-                    <td>Branch</td>
-                    <td>SHA</td>
-                    <td>Time</td>
-                </tr>
+            <tr>
+                <td>Status</td>
+                <td>Branch</td>
+                <td>SHA</td>
+                <td>Time</td>
+            </tr>
             </thead>
             <tbody>
-                {% for build in builds %}
+            {% for build in builds %}
                 <tr>
                     <td>
                         <div class="ui text {% if build.status == 'success' %}green{% else %}red{% endif %}">
@@ -78,7 +81,7 @@
                     </td>
                     <td>{{ build.created_at|naturaltime }}</td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
         {% for build in builds %}
@@ -89,9 +92,38 @@
             </a>
         {% endfor %}
     </div>
+
+    <div id="stop_linting_modal" class="ui small basic modal">
+        <div class="ui icon header">
+            <i class="archive icon"></i>
+            Stop Linting
+        </div>
+        <div class="content">
+            <p>
+                Are you sure you want to stop linting "<b>{{ object.full_name }}</b>"?
+                All previous builds will be preserved, but future builds will cease.
+            </p>
+        </div>
+        <div class="actions">
+            <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div id="confirm_button" class="ui green ok inverted button">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
-<script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script type="text/javascript">
+        $.fn.api.settings.api = {
+            'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
+        };
+    </script>
+    <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}

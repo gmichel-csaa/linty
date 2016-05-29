@@ -9,11 +9,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
+from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
@@ -24,11 +26,16 @@ from interface.utils import get_github
 class BuildDetailView(generic.DetailView):
     model = Build
 
-    def get_context_data(self, **kwargs):
-        object = self.object
-        kwargs['repo'] = object.repo
-        kwargs['is_owner'] = self.request.user == kwargs['repo'].user
-        return super(BuildDetailView, self).get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        context['repo'] = self.object.repo
+        context['is_owner'] = request.user == context['repo'].user
+
+        if context['repo'].is_private and not context['is_owner']:
+            raise Http404
+
+        return self.render_to_response(context)
 
 
 class RepoDetailView(generic.DetailView):
@@ -36,27 +43,20 @@ class RepoDetailView(generic.DetailView):
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
 
-    def get_context_data(self, **kwargs):
-        object = self.object
-        url = reverse('badge', kwargs={'full_name': object.full_name})
-
-        kwargs['owner'] = self.request.user == object.user
-        kwargs['absolute_url'] = self.request.build_absolute_uri(self.request.path)
-        kwargs['builds'] = Build.objects.filter(repo=object)
-        kwargs['badge_url'] = self.request.build_absolute_uri(url)
-
-        return super(RepoDetailView, self).get_context_data(**kwargs)
-
     def get(self, request, *args, **kwargs):
-        object = self.get_object()
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
 
-        if object.is_private and not request.user.is_authenticated():
-            return redirect(reverse('social:begin', kwargs={'backend': 'github'}))
+        context['is_owner'] = self.request.user == self.object.user
+        if self.object.is_private and not context['is_owner']:
+            raise Http404
 
-        if object.is_private and object.user != request.user:
-            return HttpResponse(status=403)
+        url = reverse('badge', kwargs={'full_name': self.object.full_name})
+        context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
+        context['builds'] = Build.objects.filter(repo=self.object)
+        context['badge_url'] = self.request.build_absolute_uri(url)
 
-        return super(RepoDetailView, self).get(request, *args, **kwargs)
+        return self.render_to_response(context)
 
 
 class RepoListView(LoginRequiredMixin, generic.ListView):
@@ -85,20 +85,34 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
         return super(RepoListView, self).get_context_data(**kwargs)
 
 
-class RepoDeleteView(LoginRequiredMixin, generic.DetailView):
+class RepoDeleteView(generic.DetailView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(RepoDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
 
         if obj.user != self.request.user:
-            return HttpResponse(status=403)
+            raise Http404
 
         obj.soft_delete()
 
         return redirect(reverse('repo_list'))
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        if obj.user != self.request.user:
+            raise Http404
+
+        obj.soft_delete()
+
+        return HttpResponse(status=204)
 
 
 @login_required
@@ -107,15 +121,19 @@ def ProcessRepo(request, full_name):
     g = get_github(user)
 
     grepo = g.get_repo(full_name)
-    hook = grepo.create_hook(
-        'web',
-        {
-            'content_type': 'json',
-            'url': request.build_absolute_uri(reverse('webhook'))
-        },
-        events=['push'],
-        active=True
-    )
+
+    try:
+        hook = grepo.create_hook(
+            'web',
+            {
+                'content_type': 'json',
+                'url': request.build_absolute_uri(reverse('webhook'))
+            },
+            events=['push'],
+            active=True
+        )
+    except UnknownObjectException:
+        raise Http404
 
     repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
