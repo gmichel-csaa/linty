@@ -156,10 +156,11 @@ def ProcessRepo(request, full_name):
 def WebhookView(request):
     try:
         body = json.loads(request.body)
+        assert body
     except ValueError:
         return HttpResponse('Invalid JSON body.', status=400)
 
-    if 'ref' not in body:
+    if 'ref' not in body or 'compare' in body:
         return HttpResponse(status=204)
 
     try:
