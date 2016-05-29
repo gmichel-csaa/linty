@@ -26,11 +26,16 @@ from interface.utils import get_github
 class BuildDetailView(generic.DetailView):
     model = Build
 
-    def get_context_data(self, **kwargs):
-        object = self.object
-        kwargs['repo'] = object.repo
-        kwargs['is_owner'] = self.request.user == kwargs['repo'].user
-        return super(BuildDetailView, self).get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        context['repo'] = self.object.repo
+        context['is_owner'] = request.user == context['repo'].user
+
+        if context['repo'].is_private and not context['is_owner']:
+            raise Http404
+
+        return self.render_to_response(context)
 
 
 class RepoDetailView(generic.DetailView):
@@ -38,27 +43,20 @@ class RepoDetailView(generic.DetailView):
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
 
-    def get_context_data(self, **kwargs):
-        object = self.object
-        url = reverse('badge', kwargs={'full_name': object.full_name})
-
-        kwargs['owner'] = self.request.user == object.user
-        kwargs['absolute_url'] = self.request.build_absolute_uri(self.request.path)
-        kwargs['builds'] = Build.objects.filter(repo=object)
-        kwargs['badge_url'] = self.request.build_absolute_uri(url)
-
-        return super(RepoDetailView, self).get_context_data(**kwargs)
-
     def get(self, request, *args, **kwargs):
-        object = self.get_object()
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
 
-        if object.is_private and not request.user.is_authenticated():
-            return redirect(reverse('social:begin', kwargs={'backend': 'github'}))
+        context['is_owner'] = self.request.user == self.object.user
+        if self.object.is_private and not context['is_owner']:
+            raise Http404
 
-        if object.is_private and object.user != request.user:
-            return HttpResponse(status=403)
+        url = reverse('badge', kwargs={'full_name': self.object.full_name})
+        context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
+        context['builds'] = Build.objects.filter(repo=self.object)
+        context['badge_url'] = self.request.build_absolute_uri(url)
 
-        return super(RepoDetailView, self).get(request, *args, **kwargs)
+        return self.render_to_response(context)
 
 
 class RepoListView(LoginRequiredMixin, generic.ListView):
