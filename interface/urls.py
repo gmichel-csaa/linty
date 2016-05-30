@@ -19,6 +19,3 @@ urlpatterns = [
     url(r'^logout', views.LogoutView, name='logout'),
     url(r'^login', views.LoginView, name='login')
 ]
-
-handler404 = 'interface.views.handler404'
-handler500 = 'interface.views.handler500'
