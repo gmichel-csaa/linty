@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from github import UnknownObjectException
 
 from interface.utils import get_github
 
@@ -17,10 +18,16 @@ class Repo(models.Model):
 
     def soft_delete(self):
         g = get_github(self.user)
-        hook = g.get_repo(self.full_name).get_hook(self.webhook_id)
-        hook.delete()
+        grepo = g.get_repo(self.full_name)
 
-        self.webhook_id = None
+        try:
+            assert self.webhook_id
+            hook = grepo.get_hook(self.webhook_id)
+            hook.delete()
+            self.webhook_id = None
+        except (UnknownObjectException, AssertionError):
+            pass
+
         self.save()
 
     class Meta:

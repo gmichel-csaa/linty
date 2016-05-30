@@ -1,9 +1,12 @@
+import hashlib
+import hmac
 import json
 import os
 import shutil
 import subprocess
 
 import requests
+from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -126,23 +129,23 @@ class RepoDeleteView(generic.DetailView):
 def ProcessRepo(request, full_name):
     user = request.user
     g = get_github(user)
-
     grepo = g.get_repo(full_name)
+
+    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     try:
         hook = grepo.create_hook(
             'web',
             {
                 'content_type': 'json',
-                'url': request.build_absolute_uri(reverse('webhook'))
+                'url': request.build_absolute_uri(reverse('webhook')),
+                'secret': settings.WEBHOOK_SECRET
             },
             events=['push'],
             active=True
         )
     except UnknownObjectException:
         raise Http404
-
-    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     repo.webhook_id = hook.id
     repo.private = grepo.private
@@ -154,6 +157,17 @@ def ProcessRepo(request, full_name):
 
 @csrf_exempt
 def WebhookView(request):
+    if 'HTTP_X_HUB_SIGNATURE' not in request.META:
+        return HttpResponse(status=403)
+
+    sig = request.META['HTTP_X_HUB_SIGNATURE']
+    text = request.body
+
+    signature = 'sha1=' + hmac.new(settings.WEBHOOK_SECRET, msg=text, digestmod=hashlib.sha1).hexdigest()
+
+    if not hmac.compare_digest(sig, signature):
+        return HttpResponse(status=403)
+
     try:
         body = json.loads(request.body)
         assert body
@@ -181,7 +195,6 @@ def WebhookView(request):
     clone_url = body['repository']['clone_url']
     clone_url = clone_url.replace('github.com', '%s:%s@github.com' % (username, password))
     branch = body['ref'].replace('refs/heads/', '')
-
     sha = body['head_commit']['id']
     status_url = body['repository']['statuses_url'].replace('{sha}', sha)
 

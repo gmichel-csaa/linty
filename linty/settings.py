@@ -146,6 +146,8 @@ SOCIAL_AUTH_LOGIN_URL = LOGIN_URL
 LOGIN_REDIRECT_URL = '/repos'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = LOGIN_REDIRECT_URL
 
+WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
+
 # Production
 if not DEBUG:  # pragma: no cover
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
