@@ -3,10 +3,13 @@
     margin-right: 1em!important;
 }
 .ui.text.red {
-    color: #db2828!important
+    color: #db2828!important;
+}
+.ui.text.yellow {
+    color: #fbbd08!important;
 }
 .ui.text.green {
-    color: #21ba45!important
+    color: #21ba45!important;
 }
 .repo_link {
     color: #2185d0!important;

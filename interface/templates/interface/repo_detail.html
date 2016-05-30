@@ -68,8 +68,8 @@
             {% for build in builds %}
                 <tr>
                     <td>
-                        <div class="ui text {% if build.status == 'success' %}green{% else %}red{% endif %}">
-                            <i class="large icon {% if build.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+                        <div class="ui text {% if build.status == 'success' %}green{% elif build.status == 'pending' %}yellow{% else %}red{% endif %}">
+                            <i class="large icon {% if build.status == 'success' %}check{% elif build.status == 'pending' %}warning triangle{% else %}warning circle{% endif %}"></i>
                             {{ build.status }}
                         </div>
                     </td>
