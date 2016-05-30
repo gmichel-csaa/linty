@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block title %}Linty - Error{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        {% if user.is_authenticated %}
+            <div class="ui item">
+                <div class="ui large breadcrumb">
+                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                    <i class="right chevron icon divider"></i>
+                    <div class="active section">Error</div>
+                </div>
+            </div>
+            <div class="ui right dropdown item">
+                {{ user.username }}
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="{% url 'logout' %}" class="item">Log Out</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="ui right item">
+                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="ui container center aligned">
+        <h1 class="ui header">Page Not Found</h1>
+        <p class="description">The page you tried to reach does not exist.</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'repo_list' %}" class="ui big primary button">Go to Dashboard</a>
+        {% else %}
+            <a href="/" class="ui big primary button">Go to Home Page</a>
+        {% endif %}
+    </div>
+{% endblock %}

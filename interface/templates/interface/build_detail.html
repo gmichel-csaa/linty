@@ -5,65 +5,65 @@
 {% block title %}Linty - {{ object.short_sha }}{% endblock %}
 
 {% block body %}
-    <div class="ui main text container">
-        <div class="ui text menu">
-            <div class="ui item">
-                <div class="ui large breadcrumb">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
-                        <i class="right chevron icon divider"></i>
-                    {% endif %}
-                    {% if not repo.is_private or is_owner %}
-                        <a href="{% url 'repo_detail' full_name=repo.full_name %}" class="section">
-                            {{ repo.full_name }}
-                        </a>
-                        <i class="right chevron icon divider"></i>
-                    {% endif %}
-                    <div class="active section">{{ object.ref }} : {{ object.short_sha }}</div>
-                </div>
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                    <i class="right chevron icon divider"></i>
+                {% endif %}
+                {% if not repo.is_private or is_owner %}
+                    <a href="{% url 'repo_detail' full_name=repo.full_name %}" class="section">
+                        {{ repo.full_name }}
+                    </a>
+                    <i class="right chevron icon divider"></i>
+                {% endif %}
+                <div class="active section">{{ object.ref }} : {{ object.short_sha }}</div>
             </div>
-            {% if user.is_authenticated %}
+        </div>
+        {% if user.is_authenticated %}
             <div class="ui right dropdown item">
                 {{ user.username }}
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+                    <a href="
+                            {% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}"
+                       class="item">Log Out</a>
                 </div>
             </div>
-            {% else %}
+        {% else %}
             <div class="ui right item">
                 <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
             </div>
-            {% endif %}
-        </div>
+        {% endif %}
+    </div>
 
-        <div class="ui horizontal segments">
-            <div class="ui segment">
-                <div class="ui text {% if object.status == 'success' %}green{% else %}red{% endif %}">
-                    <i class="large icon {% if object.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
-                    {{ object.status }}
-                </div>
-            </div>
-            <div class="ui segment">
-                <i class="large icon fork"></i>
-                {{ object.ref }}
-            </div>
-            <div class="ui segment">
-                <i class="large icon clock"></i>
-                {{ object.created_at|naturaltime }}
+    <div class="ui horizontal segments">
+        <div class="ui segment">
+            <div class="ui text {% if object.status == 'success' %}green{% else %}red{% endif %}">
+                <i class="large icon {% if object.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+                {{ object.status }}
             </div>
         </div>
+        <div class="ui segment">
+            <i class="large icon fork"></i>
+            {{ object.ref }}
+        </div>
+        <div class="ui segment">
+            <i class="large icon clock"></i>
+            {{ object.created_at|naturaltime }}
+        </div>
+    </div>
 
-        <div class="ui styled fluid accordion">
-            <div class="title {{ object.result|yesno:"active," }}">
-                <i class="dropdown icon"></i>
-                PEP 8
-            </div>
-            <div class="content {{ object.result|yesno:"active," }}">
-                <div class="ui form transition {{ object.result|yesno:",hidden" }}">
-                    <div class="field">
-                        <textarea readonly>{{ object.result|default_if_none:"" }}</textarea>
-                    </div>
+    <div class="ui styled fluid accordion">
+        <div class="title {{ object.result|yesno:"active," }}">
+            <i class="dropdown icon"></i>
+            PEP 8
+        </div>
+        <div class="content {{ object.result|yesno:"active," }}">
+            <div class="ui form transition {{ object.result|yesno:",hidden" }}">
+                <div class="field">
+                    <textarea readonly>{{ object.result|default_if_none:"" }}</textarea>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript">
-    $('.ui.accordion').accordion();
-</script>
+    <script type="text/javascript">
+        $('.ui.accordion').accordion();
+    </script>
 {% endblock %}

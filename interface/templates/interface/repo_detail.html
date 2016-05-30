@@ -5,56 +5,56 @@
 {% block title %}Linty - {{ object.full_name }}{% endblock %}
 
 {% block body %}
-    <div class="ui main text container">
-        <div class="ui text menu">
-            <div class="ui item">
-                <div class="ui large breadcrumb">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
-                        <i class="right chevron icon divider"></i>
-                    {% endif %}
-                    <div class="active section">{{ object.full_name }}</div>
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                    <i class="right chevron icon divider"></i>
+                {% endif %}
+                <div class="active section">{{ object.full_name }}</div>
+            </div>
+        </div>
+        {% if user.is_authenticated %}
+            <div class="ui right dropdown item">
+                {{ user.username }}
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="
+                            {% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}"
+                       class="item">Log Out</a>
                 </div>
             </div>
-            {% if user.is_authenticated %}
-                <div class="ui right dropdown item">
-                    {{ user.username }}
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <a href="{% url 'logout' %}{% if not object.is_private or is_owner %}?next={{ request.path }}{% endif %}"
-                           class="item">Log Out</a>
-                    </div>
-                </div>
-            {% else %}
-                <div class="ui right item">
-                    <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
-                </div>
-            {% endif %}
-        </div>
-
-        {% if is_owner %}
-            <div class="ui text menu">
-                <div class="ui item">
-                    <img class="linty-badge" src="{{ badge_url }}"/>
-                    <div class="ui action input">
-                        <input id="badge_input" type="text" readonly
-                               value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-                        <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
-                                data-variation="inverted" data-position="top center">
-                            <i class="copy icon"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="ui right item">
-                    <div id="stop_linting" class="ui red button">
-                        Stop Linting this Repo
-                    </div>
-                </div>
+        {% else %}
+            <div class="ui right item">
+                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
             </div>
         {% endif %}
+    </div>
 
-        <h2 class="ui header">Builds</h2>
-        {% if builds %}
+    {% if is_owner %}
+        <div class="ui text menu">
+            <div class="ui item">
+                <img class="linty-badge" src="{{ badge_url }}"/>
+                <div class="ui action input">
+                    <input id="badge_input" type="text" readonly
+                           value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+                    <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
+                            data-variation="inverted" data-position="top center">
+                        <i class="copy icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ui right item">
+                <div id="stop_linting" class="ui red button">
+                    Stop Linting this Repo
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <h2 class="ui header">Builds</h2>
+    {% if builds %}
         <table class="ui very basic selectable table">
             <thead>
             <tr>
@@ -85,10 +85,9 @@
             {% endfor %}
             </tbody>
         </table>
-        {% else %}
-            <p>Builds will show here once you push commits to the repo.</p>
-        {% endif %}
-    </div>
+    {% else %}
+        <p>Builds will show here once you push commits to the repo.</p>
+    {% endif %}
 
     <div id="stop_linting_modal" class="ui small basic modal">
         <div class="ui icon header">
