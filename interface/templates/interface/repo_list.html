@@ -3,22 +3,21 @@
 {% block title %}Linty - Repos{% endblock %}
 
 {% block body %}
-    <div class="ui main text container">
-        <div class="ui text menu">
-            <div class="ui item">
-              <h1 class="ui header">Dashboard</h1>
-            </div>
-            <div class="ui right dropdown item">
-                {{ user.username }}
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a href="{% url 'logout' %}?next=/" class="item">Log Out</a>
-                </div>
+    <div class="ui text menu">
+        <div class="ui item">
+            <h1 class="ui header">Dashboard</h1>
+        </div>
+        <div class="ui right dropdown item">
+            {{ user.username }}
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <a href="{% url 'logout' %}?next=/" class="item">Log Out</a>
             </div>
         </div>
-        <h2 class="ui header">Registered Repos</h2>
-        <div class="ui large middle aligned divided relaxed selection list">
-            {% for obj in object_list %}
+    </div>
+    <h2 class="ui header">Registered Repos</h2>
+    <div class="ui large middle aligned divided relaxed selection list">
+        {% for obj in object_list %}
             <a class="item repo_link" href="{% url 'repo_detail' full_name=obj.full_name %}">
                 <div class="right floated content">
                     <div class="ui basic button">View Builds</div>
@@ -28,12 +27,12 @@
                     <span class="description build_count">{{ obj.builds_count }} Build{{ obj.builds_count|pluralize }}</span>
                 </div>
             </a>
-            {% endfor %}
-        </div>
+        {% endfor %}
+    </div>
 
-        <h2 class="ui header">Available Repos</h2>
-        <div class="ui large divided relaxed selection list">
-            {% for obj in repos %}
+    <h2 class="ui header">Available Repos</h2>
+    <div class="ui large divided relaxed selection list">
+        {% for obj in repos %}
             <a class="item available_repo" href="{% url 'process_repo' full_name=obj.full_name %}">
                 <div class="right floated content">
                     <div class="ui primary button">Start Linting</div>
@@ -42,15 +41,14 @@
                     <span>{{ obj.full_name }}</span>
                 </div>
             </a>
-            {% endfor %}
-        </div>
+        {% endfor %}
     </div>
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript">
-$('.available_repo, .repo_link').on('click', function(e){
-   $(this).find('.button').addClass('loading');
-});
-</script>
+    <script type="text/javascript">
+        $('.available_repo, .repo_link').on('click', function (e) {
+            $(this).find('.button').addClass('loading');
+        });
+    </script>
 {% endblock %}

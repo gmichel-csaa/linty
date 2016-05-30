@@ -36,7 +36,7 @@ class BuildDetailView(generic.DetailView):
         context['is_owner'] = request.user == context['repo'].user
 
         if context['repo'].is_private and not context['is_owner']:
-            raise Http404
+            raise Http404('You are not allowed to view this Build')
 
         return self.render_to_response(context)
 
@@ -52,7 +52,7 @@ class RepoDetailView(generic.DetailView):
 
         context['is_owner'] = self.request.user == self.object.user
         if self.object.is_private and not context['is_owner']:
-            raise Http404
+            raise Http404('You are not allowed to view this Repo')
 
         url = reverse('badge', kwargs={'full_name': self.object.full_name})
         context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
@@ -108,7 +108,7 @@ class RepoDeleteView(generic.DetailView):
         obj = self.get_object()
 
         if obj.user != self.request.user:
-            raise Http404
+            raise Http404('You are not allowed to delete this repo')
 
         obj.soft_delete()
 
@@ -118,7 +118,7 @@ class RepoDeleteView(generic.DetailView):
         obj = self.get_object()
 
         if obj.user != self.request.user:
-            raise Http404
+            raise Http404('You are not allowed to delete this repo')
 
         obj.soft_delete()
 
@@ -145,7 +145,7 @@ def ProcessRepo(request, full_name):
             active=True
         )
     except UnknownObjectException:
-        raise Http404
+        raise Http404('Github failed to create a hook')
 
     repo.webhook_id = hook.id
     repo.private = grepo.private

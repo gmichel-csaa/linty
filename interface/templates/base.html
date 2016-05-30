@@ -1,20 +1,22 @@
 {% load staticfiles %}
 <html>
-    <head>
-        <title>{% if DEBUG %}[DEBUG] {% endif %}{% block title %}{% endblock %}</title>
-        <meta charset="UTF-8">
-        <meta name="description" content="Free automated code linting">
-        <meta name="keywords" content="code,lint,linty,pep8,eslint,ci">
-        <meta name="author" content="https://github.com/birkholz">
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    </head>
-    <body>
+<head>
+    <title>{% if DEBUG %}[DEBUG] {% endif %}{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Free automated code linting">
+    <meta name="keywords" content="code,lint,linty,pep8,eslint,ci">
+    <meta name="author" content="https://github.com/birkholz">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="ui main text container">
     {% block body %}
     {% endblock %}
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-rc1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js" ></script>
-    <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
-    {% block extra_js %}{% endblock %}
-    </body>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-rc1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+<script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
 </html>
