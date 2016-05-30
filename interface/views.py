@@ -129,8 +129,9 @@ class RepoDeleteView(generic.DetailView):
 def ProcessRepo(request, full_name):
     user = request.user
     g = get_github(user)
-
     grepo = g.get_repo(full_name)
+
+    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     try:
         hook = grepo.create_hook(
@@ -145,8 +146,6 @@ def ProcessRepo(request, full_name):
         )
     except UnknownObjectException:
         raise Http404
-
-    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     repo.webhook_id = hook.id
     repo.private = grepo.private
@@ -196,7 +195,6 @@ def WebhookView(request):
     clone_url = body['repository']['clone_url']
     clone_url = clone_url.replace('github.com', '%s:%s@github.com' % (username, password))
     branch = body['ref'].replace('refs/heads/', '')
-
     sha = body['head_commit']['id']
     status_url = body['repository']['statuses_url'].replace('{sha}', sha)
 
