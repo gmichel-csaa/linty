@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
@@ -281,3 +281,15 @@ def LogoutView(request):
     next = request.GET.get('next', '/')
     logout(request)
     return redirect(next)
+
+
+def handler404(request):
+    response = render(request, 'interface/404.html')
+    response.status_code = 404
+    return response
+
+
+def handler500(request):
+    response = render(request, 'interface/500.html')
+    response.status_code = 500
+    return response
