@@ -5,13 +5,11 @@ import subprocess
 import requests
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from rq.decorators import job
 from social.apps.django_app.default.models import UserSocialAuth
 
 from interface.models import Build, Repo
 
 
-@job(queue='default')
 def build_handler(body, base_url):
     try:
         repo = Repo.objects.get(full_name=body['repository']['full_name'])

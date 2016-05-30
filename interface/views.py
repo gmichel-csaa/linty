@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 
+import django_rq
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -174,7 +175,8 @@ def WebhookView(request):
         return HttpResponse(status=204)
 
     base_url = request.build_absolute_uri('/')[:-1]
-    build_handler.delay(body, base_url)
+
+    django_rq.enqueue(build_handler, body, base_url)
 
     return HttpResponse(status=202)
 
