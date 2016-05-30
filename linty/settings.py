@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social.apps.django_app.default',
     'django.contrib.humanize',
-    'interface'
+    'interface',
+    'django_rq'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -147,6 +148,16 @@ LOGIN_REDIRECT_URL = '/repos'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
+
+RQ_QUEUES = {
+    'default': {
+        'URL': os.environ.get('REDIS_URL', 'redis://localhost:6379/0'),
+        'DEFAULT_TIMEOUT': 360,
+    }
+}
+if DEBUG:
+    for queueConfig in RQ_QUEUES.itervalues():
+        queueConfig['ASYNC'] = False
 
 # Production
 if not DEBUG:  # pragma: no cover
