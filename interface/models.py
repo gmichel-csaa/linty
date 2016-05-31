@@ -1,12 +1,29 @@
 from django.contrib.auth.models import User
 from django.db import models
 from github import UnknownObjectException
+from social.apps.django_app.default.models import UserSocialAuth
 
+from interface.linters import LINTER_CHOICES
 from interface.utils import get_github
 
 
+class UserProxy(User):
+    class Meta:
+        proxy = True
+
+    def get_auth(self):
+        try:
+            data = UserSocialAuth.objects.filter(user=self).values_list('extra_data')[0][0]
+        except:
+            return None
+
+        username = data['login']
+        password = data['access_token']
+        return (username, password)
+
+
 class Repo(models.Model):
-    user = models.ForeignKey(User, related_name='repos')
+    user = models.ForeignKey(UserProxy, related_name='repos')
     full_name = models.TextField()
     webhook_id = models.IntegerField(null=True, blank=True)
     is_private = models.BooleanField(default=True)
@@ -58,18 +75,15 @@ class Build(models.Model):
     def short_sha(self):
         return self.sha[:7]
 
+    @property
+    def directory(self):
+        return 'tmp/%s' % self.sha[:7]
+
     class Meta:
         ordering = ['-created_at']
 
 
 class Result(models.Model):
-    PEP8 = 'PEP8'
-    ESLINT = 'eslint'
-    LINTER_CHOICES = (
-        (PEP8, PEP8),
-        (ESLINT, ESLINT)
-    )
-
     build = models.ForeignKey(Build, related_name='results')
     linter = models.TextField(choices=LINTER_CHOICES)
     output = models.TextField(null=True, blank=True)

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from interface import linters
 from interface.models import Repo, Build, Result
 
 
@@ -25,7 +26,7 @@ class LintTestCase(TestCase):
         )
         self.result = Result.objects.create(
             build=self.build,
-            linter=Result.PEP8,
+            linter=linters.PEP8,
             output='/interface/views.py:34:1: E303 too many blank lines (3)'
         )
 
