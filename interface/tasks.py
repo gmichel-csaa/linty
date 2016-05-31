@@ -56,16 +56,10 @@ def build_handler(body, base_url):
     subprocess.call(['git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', branch])
 
     # run linting
-    passing = True
-
-    def run_linter(linter):
-        result = linters.lint(build, linter)
-        return True if result and passing else False
-
-    run_linter(linters.PEP8)
+    passing = linters.lint(build)
 
     # clean up
-    shutil.rmtree(directory)
+    shutil.rmtree(build.directory)
 
     if passing:
         publish_status('success', 'Your code passed linting.')
