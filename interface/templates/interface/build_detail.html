@@ -26,8 +26,7 @@
                 {{ user.username }}
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="
-                            {% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}"
+                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}"
                        class="item">Log Out</a>
                 </div>
             </div>
@@ -55,19 +54,23 @@
         </div>
     </div>
 
-    <div class="ui styled fluid accordion">
-        <div class="title {{ object.result|yesno:"active," }}">
-            <i class="dropdown icon"></i>
-            PEP 8
-        </div>
-        <div class="content {{ object.result|yesno:"active," }}">
-            <div class="ui form transition {{ object.result|yesno:",hidden" }}">
-                <div class="field">
-                    <textarea readonly>{{ object.result|default_if_none:"" }}</textarea>
+    {% for result in results %}
+        {% with output=result.output %}
+            <div class="ui styled fluid accordion">
+                <div class="title {{ output|yesno:"active," }}">
+                    <i class="dropdown icon"></i>
+                    {{ result.linter }}
+                </div>
+                <div class="content {{ output|yesno:"active," }}">
+                    <div class="ui form transition {{ output|yesno:",hidden" }}">
+                        <div class="field">
+                            <textarea readonly>{{ output|default_if_none:"" }}</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {% endwith %}
+    {% endfor %}
 {% endblock %}
 
 {% block extra_js %}
