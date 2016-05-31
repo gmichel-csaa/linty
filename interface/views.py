@@ -130,6 +130,9 @@ def ProcessRepo(request, full_name):
     g = get_github(user)
     grepo = g.get_repo(full_name)
 
+    if not grepo.full_name:
+        raise Http404('Repo not found')
+
     repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
 
     try:
@@ -147,7 +150,7 @@ def ProcessRepo(request, full_name):
         raise Http404('Github failed to create a hook')
 
     repo.webhook_id = hook.id
-    repo.private = grepo.private
+    repo.is_private = grepo.private
     repo.save()
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
