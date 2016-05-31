@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
-from interface.models import Repo, Build
+from interface.models import Repo, Build, Result
 
 
 class LintTestCase(TestCase):
@@ -21,8 +21,12 @@ class LintTestCase(TestCase):
             repo=self.repo,
             ref='master',
             sha='2278cd53905d74f01d2ec5bae3cf136ad66e7393',
-            status=Build.ERROR,
-            result='/interface/views.py:34:1: E303 too many blank lines (3)'
+            status=Build.ERROR
+        )
+        self.result = Result.objects.create(
+            build=self.build,
+            linter=Result.PEP8,
+            output='/interface/views.py:34:1: E303 too many blank lines (3)'
         )
 
 
@@ -123,6 +127,11 @@ class BuildDetailTests(LintTestCase):
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+    def test_build_detail_contains_results(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertContains(response, self.result.output)
 
 
 class BadgeTests(LintTestCase):

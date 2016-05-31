@@ -35,6 +35,8 @@ class BuildDetailView(generic.DetailView):
         if context['repo'].is_private and not context['is_owner']:
             raise Http404('You are not allowed to view this Build')
 
+        context['results'] = self.object.results.all()
+
         return self.render_to_response(context)
 
 

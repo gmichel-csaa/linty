@@ -51,7 +51,6 @@ class Build(models.Model):
     ref = models.TextField()
     sha = models.TextField()
     status = models.TextField(choices=STATUS_CHOICES, default=PENDING)
-    result = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
@@ -61,3 +60,16 @@ class Build(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class Result(models.Model):
+    PEP8 = 'PEP8'
+    ESLINT = 'eslint'
+    LINTER_CHOICES = (
+        (PEP8, PEP8),
+        (ESLINT, ESLINT)
+    )
+
+    build = models.ForeignKey(Build, related_name='results')
+    linter = models.TextField(choices=LINTER_CHOICES)
+    output = models.TextField(null=True, blank=True)

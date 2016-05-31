@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from social.apps.django_app.default.models import UserSocialAuth
 
-from interface.models import Build, Repo
+from interface.models import Build, Repo, Result
 
 
 def build_handler(body, base_url):
@@ -82,9 +82,11 @@ def build_handler(body, base_url):
         url = base_url + path
         publish_status(status, 'Your code has lint failures. See Details.', target_url=url)
 
+    # save result
+    Result.objects.create(build=build, linter=Result.PEP8, output=output)
+
     # update build record
     build.status = status
-    build.result = output
     build.finished_at = timezone.now()
     build.save()
 
