@@ -1,14 +1,13 @@
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from interface import linters
-from interface.models import Repo, Build, Result
+from interface.models import Repo, Build, Result, UserProxy
 
 
 class LintTestCase(TestCase):
     def setUp(self):
-        self.user = User.objects.create(
+        self.user = UserProxy.objects.create(
             username='test',
             password='test'
         )

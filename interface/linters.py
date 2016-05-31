@@ -1,6 +1,6 @@
 import subprocess
 
-from interface.models import Result
+from django.apps import apps
 
 
 PEP8 = 'PEP8'
@@ -19,8 +19,8 @@ def lint(build):
         result = linter(build)
         return True if result and passing else False
 
-    run_linter(pep8)
-    # run_linter(eslint)
+    passing = run_linter(pep8)
+    # passing = run_linter(eslint)
 
     return passing
 
@@ -35,6 +35,7 @@ def pep8(build):
 
     passing = True
     output = output.replace(build.directory, '')
+    Result = apps.get_model('interface', 'Result')
     Result.objects.create(build=build, linter=PEP8, output=output)
     if output:
         passing = False
@@ -51,6 +52,7 @@ def eslint(build):
     passing = True
     if output:
         output = output.replace(build.directory, '')
+        Result = apps.get_model('interface', 'Result')
         Result.objects.create(build=build, linter=ESLINT, output=output)
         passing = False
 
