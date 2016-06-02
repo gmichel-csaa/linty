@@ -1,8 +1,8 @@
 # linty
-[![Stories in Ready](https://badge.waffle.io/birkholz/linty.png?label=ready&title=Waffle)](https://waffle.io/birkholz/linty)
-[![CircleCI](https://circleci.com/gh/birkholz/linty.svg?style=svg)](https://circleci.com/gh/birkholz/linty)
-[![Coverage Status](https://coveralls.io/repos/github/birkholz/linty/badge.svg?branch=master)](https://coveralls.io/github/birkholz/linty?branch=master)
-[![Linty](https://linty.herokuapp.com/repo/birkholz/linty/badge.svg)](https://linty.herokuapp.com/repo/birkholz/linty)
+[![Stories in Ready](https://badge.waffle.io/ZeroCater/linty.png?label=ready&title=Waffle)](https://waffle.io/ZeroCater/linty)
+[![CircleCI](https://circleci.com/gh/ZeroCater/linty.svg?style=svg)](https://circleci.com/gh/ZeroCater/linty)
+[![Coverage Status](https://coveralls.io/repos/github/ZeroCater/linty/badge.svg?branch=master)](https://coveralls.io/github/ZeroCater/linty?branch=master)
+[![Linty](https://linty.herokuapp.com/repo/ZeroCater/linty/badge.svg)](https://linty.herokuapp.com/repo/ZeroCater/linty)
 
 Linty is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
 
@@ -21,7 +21,7 @@ To get linty running locally for development, you'll need a few things:
 * PostgreSQL (I highly recommend [Postgres.app](http://postgresapp.com/) for Mac)
 
 ```bash
-git clone https://github.com/birkholz/linty.git && cd linty
+git clone https://github.com/ZeroCater/linty.git && cd linty
 pip install -r requirements.dev.txt
 cp .env.sample .env
 
