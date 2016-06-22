@@ -81,6 +81,20 @@ class RepoDetailTests(LintTestCase):
         self.assertContains(response, self.repo.full_name)
         self.assertContains(response, self.build.id)
 
+    def test_build_results_paginated(self):
+        for _ in xrange(49):
+            Build.objects.create(
+                repo=self.repo,
+                ref='master',
+                sha='2278cd53905d74f01d2ec5bae3cf136ad66e7393',
+                status=Build.ERROR
+            )
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(Build.objects.count(), 50)
+        self.assertEqual(len(response.context_data['builds']), 25)
+
 
 class RepoDeleteTests(LintTestCase):
     def setUp(self):

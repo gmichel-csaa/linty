@@ -89,6 +89,23 @@
         <p>Builds will show here once you push commits to the repo.</p>
     {% endif %}
 
+    {% if builds.paginator.num_pages > 1 %}
+        <div class="ui grid center aligned paginator_bottom">
+            <div class="ui pagination menu">
+                <a class="item" href="?page=1">First</a>
+                {% for page in pages %}
+                    {% if page == builds.number %}
+                        <a class="item active" href="?page={{ page }}">{{ page }}</a>
+                    {% else %}
+                        <a class="item" href="?page={{ page }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+                <a class="item" href="?page={{ builds.paginator.num_pages }}">Last</a>
+            </div>
+            <div class="right floated build_label">{{ num_objects }} builds</div>
+        </div>
+    {% endif %}
+
     <div id="stop_linting_modal" class="ui small basic modal">
         <div class="ui icon header">
             <i class="archive icon"></i>
