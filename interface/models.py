@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
@@ -24,7 +26,7 @@ class UserProxy(User):
 
 class Repo(models.Model):
     user = models.ForeignKey(UserProxy, related_name='repos')
-    full_name = models.TextField()
+    full_name = models.TextField(unique=True)
     webhook_id = models.IntegerField(null=True, blank=True)
     is_private = models.BooleanField(default=True)
 
@@ -45,6 +47,35 @@ class Repo(models.Model):
         except (UnknownObjectException, AssertionError):
             pass
 
+        self.save()
+
+    def user_is_collaborator(self, user):
+        if not user.is_authenticated():
+            return False
+        if self.user == user:
+            return True
+        g = get_github(user)
+        grepo = g.get_repo(self.full_name)
+        guser = g.get_user(user.username)
+        return grepo.has_in_collaborators(guser)
+
+    def add_webhook(self, request):
+        g = get_github(request.user)
+        grepo = g.get_repo(self.full_name)
+
+        hook = grepo.create_hook(
+            'web',
+            {
+                'content_type': 'json',
+                'url': request.build_absolute_uri(reverse('webhook')),
+                'secret': settings.WEBHOOK_SECRET
+            },
+            events=['push'],
+            active=True
+        )
+
+        self.webhook_id = hook.id
+        self.is_private = grepo.private
         self.save()
 
     class Meta:

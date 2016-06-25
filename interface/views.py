@@ -30,9 +30,10 @@ class BuildDetailView(generic.DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         context['repo'] = self.object.repo
-        context['is_owner'] = request.user == context['repo'].user
+        is_collab = context['repo'].user_is_collaborator(request.user)
+        context['is_owner'] = is_collab
 
-        if context['repo'].is_private and not context['is_owner']:
+        if context['repo'].is_private and not is_collab:
             raise Http404('You are not allowed to view this Build')
 
         context['results'] = self.object.results.all()
@@ -49,8 +50,10 @@ class RepoDetailView(generic.DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
 
-        context['is_owner'] = self.request.user == self.object.user
-        if self.object.is_private and not context['is_owner']:
+        is_collab = self.object.user_is_collaborator(request.user)
+        context['is_owner'] = is_collab
+
+        if self.object.is_private and not is_collab:
             raise Http404('You are not allowed to view this Repo')
 
         url = reverse('badge', kwargs={'full_name': self.object.full_name})
@@ -103,55 +106,52 @@ class RepoDeleteView(generic.DetailView):
     def dispatch(self, request, *args, **kwargs):
         return super(RepoDeleteView, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def soft_delete(self, request):
         obj = self.get_object()
 
-        if obj.user != self.request.user:
+        if not obj.user_is_collaborator(request.user):
             raise Http404('You are not allowed to delete this repo')
 
         obj.soft_delete()
 
+    def get(self, request, *args, **kwargs):
+        self.soft_delete(request)
         return redirect(reverse('repo_list'))
 
     def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
-
-        if obj.user != self.request.user:
-            raise Http404('You are not allowed to delete this repo')
-
-        obj.soft_delete()
-
+        self.soft_delete(request)
         return HttpResponse(status=204)
 
 
 @login_required
 def ProcessRepo(request, full_name):
     user = request.user
-    g = get_github(user)
+    g = get_github(request.user)
     grepo = g.get_repo(full_name)
 
     if not grepo.full_name:
         raise Http404('Repo not found')
 
-    repo, _created = Repo.objects.get_or_create(full_name=grepo.full_name, user=user)
+    guser = g.get_user(user.username)
+    is_collab = grepo.has_in_collaborators(guser)
 
     try:
-        hook = grepo.create_hook(
-            'web',
-            {
-                'content_type': 'json',
-                'url': request.build_absolute_uri(reverse('webhook')),
-                'secret': settings.WEBHOOK_SECRET
-            },
-            events=['push'],
-            active=True
-        )
-    except UnknownObjectException:
-        raise Http404('Github failed to create a hook')
+        repo = Repo.objects.get(full_name=grepo.full_name)
+    except Repo.DoesNotExist:
+        repo = None
 
-    repo.webhook_id = hook.id
-    repo.is_private = grepo.private
-    repo.save()
+    if not is_collab:
+        if grepo.private or not repo:
+            raise Http404('You are not a collaborator of this repo')
+    else:
+        if not repo:
+            repo = Repo.objects.create(full_name=grepo.full_name, user=user)
+
+        if not repo.webhook_id:
+            try:
+                repo.add_webhook(request)
+            except UnknownObjectException:
+                raise Http404('Github failed to create a hook')
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)

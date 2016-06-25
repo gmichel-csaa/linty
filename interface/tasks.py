@@ -34,6 +34,8 @@ def build_handler(body, base_url):
         status=Build.PENDING
     )
 
+    url = '{0}{1}'.format(base_url, reverse('build_detail', kwargs={'pk': build.id}))
+
     def publish_status(state, description, target_url=None):
         data = {
             'state': state,
@@ -43,7 +45,7 @@ def build_handler(body, base_url):
         }
         requests.post(status_url, json=data, auth=auth)
 
-    publish_status('pending', 'Linting your code...')
+    publish_status('pending', 'Linting your code...', target_url=url)
 
     # download repo
     if not os.path.exists('tmp'):
@@ -62,10 +64,8 @@ def build_handler(body, base_url):
     shutil.rmtree(build.directory)
 
     if passing:
-        publish_status('success', 'Your code passed linting.')
+        publish_status('success', 'Your code passed linting.', target_url=url)
     else:
-        path = reverse('build_detail', kwargs={'pk': build.id})
-        url = base_url + path
         publish_status('error', 'Your code has lint failures. See Details.', target_url=url)
 
     # update build record
