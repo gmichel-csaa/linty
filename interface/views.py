@@ -67,19 +67,7 @@ class RepoDetailView(generic.DetailView):
 class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
 
-    def get_queryset(self):
-        repos = Repo.objects.filter(
-            user=self.request.user,
-            webhook_id__isnull=False
-        ).annotate(builds_count=Count('builds'))
-        return repos
-
     def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
-        context = self.get_context_data()
-
-        names = [x[0] for x in self.object_list.values_list('full_name')]
-        # Get list of user repos
         g = get_github(self.request.user)
         try:
             repos = [r for r in g.get_user().get_repos()]
@@ -87,11 +75,19 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
             UserSocialAuth.objects.filter(user=request.user).delete()
             return redirect(reverse('login'))
 
+        self.object_list = Repo.objects.filter(
+            full_name__in=[i.full_name for i in repos],
+            webhook_id__isnull=False
+        ).annotate(builds_count=Count('builds'))
+
+        names = [x.full_name for x in self.object_list]
+
         filtered = []
         for repo in repos:
             if repo.full_name not in names:
                 filtered.append(repo)
 
+        context = self.get_context_data()
         context['repos'] = filtered
 
         return self.render_to_response(context)
