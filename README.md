@@ -1,18 +1,19 @@
-# linty
+# [Linty](https://www.lintyapp.com)
 [![Stories in Ready](https://badge.waffle.io/ZeroCater/linty.png?label=ready&title=Waffle)](https://waffle.io/ZeroCater/linty)
 [![CircleCI](https://circleci.com/gh/ZeroCater/linty.svg?style=svg)](https://circleci.com/gh/ZeroCater/linty)
 [![Coverage Status](https://coveralls.io/repos/github/ZeroCater/linty/badge.svg?branch=master)](https://coveralls.io/github/ZeroCater/linty?branch=master)
 [![Linty](https://linty.herokuapp.com/repo/ZeroCater/linty/badge.svg)](https://linty.herokuapp.com/repo/ZeroCater/linty)
 
-Linty is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
+[Linty](https://www.lintyapp.com) is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
 
 Features:
 * One click repo registration/de-registration
 * Pass/Fail statuses on Pull Requests
 * History of lint results
 * Pass/Fail Badges for your READMEs
+* Proper permissions for private repos
 
-The app is live at [linty.herokuapp.com](https://linty.herokuapp.com). It's currently running on free dynos, so if the site hangs for a while when you first visit it, it's just the dynos waking up.
+The app is live at [lintyapp.com](https://www.lintyapp.com).
 
 ### Development
 
@@ -38,4 +39,5 @@ You now have the server running!
 
 ### Contribution
 
-Issues and Pull Requests are welcome. There's still a lot left before this app is really ready for public use.
+Issues and Pull Requests are welcome.
+You can view the development progress on Trello [here](https://trello.com/b/w6mQAxUG/linty)
