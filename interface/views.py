@@ -162,7 +162,8 @@ def WebhookView(request):
     sig = request.META['HTTP_X_HUB_SIGNATURE']
     text = request.body
 
-    signature = 'sha1=' + hmac.new(settings.WEBHOOK_SECRET, msg=text, digestmod=hashlib.sha1).hexdigest()
+    secret = str.encode(settings.WEBHOOK_SECRET)
+    signature = 'sha1=' + hmac.new(secret, msg=text, digestmod=hashlib.sha1).hexdigest()
 
     if not hmac.compare_digest(sig, signature):
         return HttpResponse(status=403)
