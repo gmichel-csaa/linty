@@ -2,7 +2,7 @@
 [![Stories in Ready](https://badge.waffle.io/ZeroCater/linty.png?label=ready&title=Waffle)](https://waffle.io/ZeroCater/linty)
 [![CircleCI](https://circleci.com/gh/ZeroCater/linty.svg?style=svg)](https://circleci.com/gh/ZeroCater/linty)
 [![Coverage Status](https://coveralls.io/repos/github/ZeroCater/linty/badge.svg?branch=master)](https://coveralls.io/github/ZeroCater/linty?branch=master)
-[![Linty](https://linty.herokuapp.com/repo/ZeroCater/linty/badge.svg)](https://linty.herokuapp.com/repo/ZeroCater/linty)
+[![Linty](https://www.lintyapp.com/repo/ZeroCater/linty/badge.svg)](https://www.lintyapp.com/repo/ZeroCater/linty)
 
 [Linty](https://www.lintyapp.com) is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
 
