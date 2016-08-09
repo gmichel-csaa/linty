@@ -141,7 +141,7 @@ RQ_QUEUES = {
     }
 }
 if DEBUG:
-    for queueConfig in RQ_QUEUES.itervalues():
+    for queueConfig in RQ_QUEUES.values():
         queueConfig['ASYNC'] = False
 
 # Production
