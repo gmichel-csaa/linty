@@ -1,4 +1,5 @@
 import mock as mock
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
@@ -37,7 +38,7 @@ class HomePageTests(LintTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_home_auth_200(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
@@ -53,7 +54,7 @@ class RepoListTests(LintTestCase):
 
     # Disabled because the view requires OAuth with Github
     # def test_repo_list_auth_200(self):
-    #     self.client.force_login(self.user)
+    #     self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
     #     response = self.client.get(self.url)
     #     self.assertEqual(response.status_code, 200)
     #     self.assertContains(response, self.repo.full_name)
@@ -74,7 +75,7 @@ class RepoDetailTests(LintTestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_repo_list_auth_200(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.repo.full_name)
@@ -131,7 +132,7 @@ class BuildDetailTests(LintTestCase):
     def test_build_detail_owner_200(self, mock_get_issues):
         mock_get_issues.return_value = []
 
-        self.client.force_login(self.user)
+        self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
@@ -139,7 +140,7 @@ class BuildDetailTests(LintTestCase):
     def test_build_detail_contains_results(self, mock_get_issues):
         mock_get_issues.return_value = []
 
-        self.client.force_login(self.user)
+        self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
         self.assertContains(response, self.result.output)
 
