@@ -169,7 +169,7 @@ def WebhookView(request):
         return HttpResponse(status=403)
 
     try:
-        body = json.loads(request.body)
+        body = json.loads(text.decode('utf-8'))
         assert body
     except ValueError:
         return HttpResponse('Invalid JSON body.', status=400)
