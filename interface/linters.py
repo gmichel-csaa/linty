@@ -34,7 +34,7 @@ def pycodestyle(build):
         output = e.output
 
     passing = True
-    output = output.replace(build.directory, '')
+    output = str(output).replace(build.directory, '')
     Result = apps.get_model('interface', 'Result')
     Result.objects.create(build=build, linter=PYCODESTYLE, output=output)
     if output:
@@ -51,7 +51,7 @@ def eslint(build):
 
     passing = True
     if output:
-        output = output.replace(build.directory, '')
+        output = str(output).replace(build.directory, '')
         Result = apps.get_model('interface', 'Result')
         Result.objects.create(build=build, linter=ESLINT, output=output)
         passing = False
