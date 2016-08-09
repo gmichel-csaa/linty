@@ -102,6 +102,11 @@ class Build(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
+    def get_issues(self, user):
+        g = get_github(user)
+        issues = g.search_issues('%s+repo:%s' % (self.short_sha, self.repo.full_name))
+        return issues
+
     @property
     def short_sha(self):
         return self.sha[:7]

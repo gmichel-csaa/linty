@@ -32,6 +32,7 @@ class BuildDetailView(generic.DetailView):
         context['repo'] = self.object.repo
         is_collab = context['repo'].user_is_collaborator(request.user)
         context['is_owner'] = is_collab
+        context['issues'] = self.object.get_issues(request.user)
 
         if context['repo'].is_private and not is_collab:
             raise Http404('You are not allowed to view this Build')
