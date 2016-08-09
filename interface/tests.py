@@ -1,3 +1,4 @@
+import mock as mock
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
@@ -113,7 +114,10 @@ class BuildDetailTests(LintTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_build_detail_public_200(self):
+    @mock.patch('interface.models.Build.get_issues')
+    def test_build_detail_public_200(self, mock_get_issues):
+        mock_get_issues.return_value = []
+
         self.repo.is_private = False
         self.repo.save()
         response = self.client.get(self.url)
@@ -123,12 +127,18 @@ class BuildDetailTests(LintTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_build_detail_owner_200(self):
+    @mock.patch('interface.models.Build.get_issues')
+    def test_build_detail_owner_200(self, mock_get_issues):
+        mock_get_issues.return_value = []
+
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
-    def test_build_detail_contains_results(self):
+    @mock.patch('interface.models.Build.get_issues')
+    def test_build_detail_contains_results(self, mock_get_issues):
+        mock_get_issues.return_value = []
+
         self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertContains(response, self.result.output)

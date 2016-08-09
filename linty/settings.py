@@ -7,7 +7,7 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'Thisisaterriblesecret22sdadlsdajdlsdalda')
-DEBUG = strtobool(os.environ.get('DEBUG', False))
+DEBUG = strtobool(os.environ.get('DEBUG', 'False'))
 
 HOSTNAME = os.environ.get('HOSTNAME', 'localhost')
 ALLOWED_HOSTS = ['*']

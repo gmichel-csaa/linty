@@ -8,6 +8,7 @@ dependencies:
   post:
     - pip install coverage==4.1
     - pip install coveralls==1.1
+    - pip install mock==2.0.0
 test:
   override:
     - coverage run --source=. manage.py test

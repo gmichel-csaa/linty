@@ -45,8 +45,17 @@
             </div>
         </div>
         <div class="ui segment">
+            {% if not issues %}
             <i class="large icon fork"></i>
-            {{ object.ref }}
+            <a href="https://github.com/{{ repo.full_name }}/tree/{{ object.ref }}">{{ object.ref }}</a>
+            {% else %}
+                {% for issue in issues %}
+                    <div>
+                        <i class="large icon fork"></i>
+                        <a href="{{ issue.html_url }}">#{{ issue.number }} {{ issue.title }}</a>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
         <div class="ui segment">
             <i class="large icon clock"></i>
