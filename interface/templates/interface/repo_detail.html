@@ -53,14 +53,20 @@
         </div>
     {% endif %}
 
-    <h2 class="ui header">Builds</h2>
+    <h2 class="ui header">
+        {% if ref %}
+            ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
+        {% else %}
+            All Builds
+        {% endif %}
+    </h2>
     {% if builds %}
         <table class="ui very basic selectable table">
             <thead>
             <tr>
                 <td>Status</td>
-                <td>Branch</td>
                 <td>SHA</td>
+                <td>Branch</td>
                 <td>Time</td>
             </tr>
             </thead>
@@ -74,11 +80,10 @@
                         </div>
                     </td>
                     <td>
-                        <a href="{% url 'build_detail' pk=build.pk %}">{{ build.ref }}</a>
+                        <a href="{% url 'build_detail' pk=build.pk %}">{{ build.short_sha }}</a>
                     </td>
                     <td>
-                        <i class="github middle aligned icon"></i>
-                        {{ build.short_sha }}
+                        <a href="{% url 'repo_detail' full_name=object.full_name %}?ref={{ build.ref }}">{{ build.ref }}</a>
                     </td>
                     <td>{{ build.created_at|naturaltime }}</td>
                 </tr>
