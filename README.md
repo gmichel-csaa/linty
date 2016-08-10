@@ -18,6 +18,7 @@ The app is live at [lintyapp.com](https://www.lintyapp.com).
 ### Development
 
 To get linty running locally for development, you'll need a few things:
+* Python 3
 * virtualenv/pyenv to stay sane
 * PostgreSQL (I highly recommend [Postgres.app](http://postgresapp.com/) for Mac)
 
