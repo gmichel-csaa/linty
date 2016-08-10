@@ -5,19 +5,19 @@
                 {% if builds.number == 1 %}
                     <span class="item active">First</span>
                 {% else %}
-                    <a class="item" href="?page=1">First</a>
+                    <a class="item" href="?{% if ref %}ref={{ ref }}&{% endif %}page=1">First</a>
                 {% endif %}
                 {% for page in pages %}
-                    {% if page is builds.number %}
+                    {% if page == builds.number %}
                         <span class="item active">{{ page }}</span>
                     {% else %}
-                        <a class="item" href="?page={{ page }}">{{ page }}</a>
+                        <a class="item" href="?{% if ref %}ref={{ ref }}&{% endif %}page={{ page }}">{{ page }}</a>
                     {% endif %}
                 {% endfor %}
                 {% if builds.number == builds.paginator.num_pages %}
                     <span class="item active">Last</span>
                 {% else %}
-                    <a class="item" href="?page={{ builds.paginator.num_pages }}">Last</a>
+                    <a class="item" href="?{% if ref %}ref={{ ref }}&{% endif %}page={{ builds.paginator.num_pages }}">Last</a>
                 {% endif %}
             </div>
         </div>
