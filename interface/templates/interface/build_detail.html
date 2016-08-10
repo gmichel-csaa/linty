@@ -61,6 +61,10 @@
             <i class="large icon clock"></i>
             {{ object.created_at|naturaltime }}
         </div>
+        <a class="ui segment" href="{% url 'rebuild' pk=object.id %}">
+            <i class="large icon repeat"></i>
+            Re-Run
+        </a>
     </div>
 
     {% for result in results %}

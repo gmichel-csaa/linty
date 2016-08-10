@@ -167,7 +167,7 @@ class Build(models.Model):
             'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'fetch', clone_url
         ])
         subprocess.call([
-            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', self.branch
+            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', self.sha
         ])
 
     def clean_directory(self):

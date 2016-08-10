@@ -20,6 +20,7 @@ def build_handler(build_id):
             build.set_status(auth, Build.ERROR)
 
         return 'Build finished'
-    except:
-        build.set_status(Build.CANCELLED)
+    except Exception as e:
+        print(e)
+        build.set_status(auth, Build.CANCELLED)
         return 'Build failed'
