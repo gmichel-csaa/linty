@@ -1,10 +1,17 @@
+import os
+import shutil
+import subprocess
+
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils import timezone
 from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
 
+from interface import linters
 from interface.linters import LINTER_CHOICES
 from interface.utils import get_github
 
@@ -31,6 +38,10 @@ class Repo(models.Model):
     is_private = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def clone_url(self):
+        return 'https://github.com/{}.git'.format(self.full_name)
 
     def get_head_build(self):
         return Build.objects.filter(repo=self, ref='master').only('status').first()
@@ -101,6 +112,70 @@ class Build(models.Model):
     status = models.TextField(choices=STATUS_CHOICES, default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def status_url(self):
+        return 'https://api.github.com/repos/{full_name}/statuses/{sha}'.format(
+            full_name=self.repo.full_name,
+            sha=self.sha
+        )
+
+    def publish_status(self, auth, state, description):
+        hostname = settings.HOSTNAME
+        build_url = reverse('build_detail', kwargs={'pk': self.id})
+        details_url = 'https://{0}{1}'.format(hostname, build_url)
+        data = {
+            'state': state,
+            'description': description,
+            'target_url': details_url,
+            'context': 'linty'
+        }
+        requests.post(self.status_url, json=data, auth=auth)
+
+    def set_status(self, auth, state):
+        message = ''
+        if state == self.PENDING:
+            message = 'Linting your code...'
+        elif state == self.SUCCESS:
+            message = 'Your code passed linting.'
+            self.finished_at = timezone.now()
+        elif state == self.ERROR:
+            message = 'Your code has lint failures. See Details.'
+            self.finished_at = timezone.now()
+        elif state == self.CANCELLED:
+            message = 'An error occurred while linting.'
+            self.finished_at = timezone.now()
+        if self.status != state:
+            self.status = state
+            self.save()
+        self.publish_status(auth, state, message)
+
+    def clone(self, auth):
+        clone_url = self.repo.clone_url
+        clone_url = clone_url.replace('github.com', '{}:{}@github.com'.format(*auth))
+        if not os.path.exists('tmp'):
+            os.makedirs('tmp')
+
+        self.clean_directory()
+
+        directory = self.directory
+
+        subprocess.call([
+            'git', 'clone', clone_url, self.directory
+        ])
+        subprocess.call([
+            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'fetch', clone_url
+        ])
+        subprocess.call([
+            'git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', self.branch
+        ])
+
+    def clean_directory(self):
+        if os.path.exists(self.directory):
+            shutil.rmtree(self.directory)
+
+    def lint(self):
+        return linters.lint(self)
 
     def get_issues(self, user):
         g = get_github(user)

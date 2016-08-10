@@ -198,9 +198,27 @@ def WebhookView(request):
     if 'ref' not in body or not body['head_commit']:
         return HttpResponse(status=204)
 
-    base_url = request.build_absolute_uri('/')[:-1]
+    try:
+        repo = Repo.objects.get(full_name=body['repository']['full_name'])
+    except Repo.DoesNotExist:
+        return 'Repo not registered'
 
-    django_rq.enqueue(build_handler, body, base_url)
+    auth = repo.user.get_auth()
+    if not auth:
+        return 'User for repo not logged in'
+
+    sha = body['head_commit']['id']
+    try:
+        build = Build.objects.get(sha=sha)
+    except:
+        branch = body['ref'].replace('refs/heads/', '')
+        build = Build.objects.create(
+            repo=repo,
+            ref=branch,
+            sha=sha
+        )
+
+    django_rq.enqueue(build_handler, build.id)
 
     return HttpResponse(status=202)
 
