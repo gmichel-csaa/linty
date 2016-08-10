@@ -1,7 +1,6 @@
 dj-database-url==0.4.1
 Django==1.10
 requests==2.11.0
-flake8==3.0.4
 -e git+https://github.com/PyCQA/pycodestyle.git#egg=pycodestyle
 psycopg2==2.6.2
 python-social-auth==0.2.19
