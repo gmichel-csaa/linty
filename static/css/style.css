@@ -20,3 +20,10 @@
 .build_count {
     font-size: 0.7em;
 }
+.paginator_bottom {
+    margin-bottom: 0.8em!important;
+}
+.ui.grid > .build_label {
+    margin-top: 0.5em;
+    padding-left: 0;
+}

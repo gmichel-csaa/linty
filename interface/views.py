@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import HttpResponse, Http404
@@ -20,7 +21,7 @@ from social.apps.django_app.views import auth
 
 from interface.models import Build, Repo
 from interface.tasks import build_handler
-from interface.utils import get_github
+from interface.utils import get_github, get_page_number_list
 
 
 class BuildDetailView(generic.DetailView):
@@ -59,8 +60,23 @@ class RepoDetailView(generic.DetailView):
 
         url = reverse('badge', kwargs={'full_name': self.object.full_name})
         context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
-        context['builds'] = Build.objects.filter(repo=self.object)
         context['badge_url'] = self.request.build_absolute_uri(url)
+
+        build_results = Build.objects.filter(repo=self.object)
+        paginator = Paginator(build_results, 20)
+
+        page = self.request.GET.get('page')
+        try:
+            context['builds'] = paginator.page(page)
+        except PageNotAnInteger:
+            context['builds'] = paginator.page(1)
+        except EmptyPage:
+            context['builds'] = paginator.page(paginator.num_pages)
+
+        if paginator.num_pages > 1:
+            context['pages'] = get_page_number_list(context['builds'].number, paginator.num_pages)
+
+        context['num_objects'] = paginator.count
 
         return self.render_to_response(context)
 
