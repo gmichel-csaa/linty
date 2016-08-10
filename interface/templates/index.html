@@ -23,6 +23,8 @@
                 <div class="right item">
                     {% if user.is_authenticated %}
                         <a href="{% url 'repo_list' %}" class="ui inverted button">Dashboard</a>
+                    {% elif DEBUG %}
+                        <a href="{% url 'admin:login' %}" class="ui inverted button">Log in</a>
                     {% else %}
                         <a href="{% url 'login' %}" class="ui inverted button">Log in</a>
                     {% endif %}
