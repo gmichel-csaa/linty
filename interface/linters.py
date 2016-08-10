@@ -28,17 +28,14 @@ def lint(build):
 def pycodestyle(build):
     try:
         output = subprocess.check_output(['pycodestyle', build.directory])
+        passing = True
     except subprocess.CalledProcessError as e:
-        # pycodestyle returns a non-zero code when it finds issues,
-        # so we have to catch the error to get the output
         output = e.output
+        passing = False
 
-    passing = True
-    output = str(output).replace(build.directory, '')
+    output = output.decode("utf-8").replace(build.directory, '')
     Result = apps.get_model('interface', 'Result')
     Result.objects.create(build=build, linter=PYCODESTYLE, output=output)
-    if output:
-        passing = False
 
     return passing
 
@@ -46,14 +43,14 @@ def pycodestyle(build):
 def eslint(build):
     try:
         output = subprocess.check_output(['eslint', build.directory])
+        passing = True
     except subprocess.CalledProcessError as e:
         output = e.output
+        passing = False
 
-    passing = True
     if output:
-        output = str(output).replace(build.directory, '')
+        output = output.decode("utf-8").replace(build.directory, '')
         Result = apps.get_model('interface', 'Result')
         Result.objects.create(build=build, linter=ESLINT, output=output)
-        passing = False
 
     return passing
