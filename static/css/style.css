@@ -23,6 +23,7 @@
 .paginator_bottom {
     margin-bottom: 0.8em!important;
 }
-.build_label {
+.ui.grid > .build_label {
     margin-top: 0.5em;
+    padding-left: 0;
 }

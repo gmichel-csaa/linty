@@ -82,7 +82,7 @@ class RepoDetailTests(LintTestCase):
         self.assertContains(response, self.build.id)
 
     def test_build_results_paginated(self):
-        for _ in xrange(49):
+        for _ in range(49):
             Build.objects.create(
                 repo=self.repo,
                 ref='master',
@@ -90,10 +90,10 @@ class RepoDetailTests(LintTestCase):
                 status=Build.ERROR
             )
 
-        self.client.force_login(self.user)
+        self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
         self.assertEqual(Build.objects.count(), 50)
-        self.assertEqual(len(response.context_data['builds']), 25)
+        self.assertEqual(len(response.context_data['builds']), 20)
 
 
 class RepoDeleteTests(LintTestCase):

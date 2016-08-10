@@ -63,7 +63,7 @@ class RepoDetailView(generic.DetailView):
         context['badge_url'] = self.request.build_absolute_uri(url)
 
         build_results = Build.objects.filter(repo=self.object)
-        paginator = Paginator(build_results, 25)
+        paginator = Paginator(build_results, 20)
 
         page = self.request.GET.get('page')
         try:
