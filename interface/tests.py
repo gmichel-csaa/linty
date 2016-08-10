@@ -27,7 +27,7 @@ class LintTestCase(TestCase):
         )
         self.result = Result.objects.create(
             build=self.build,
-            linter=linters.PYCODESTYLE,
+            linter=linters.FLAKE8,
             output='/interface/views.py:34:1: E303 too many blank lines (3)'
         )
 
