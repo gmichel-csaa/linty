@@ -19,7 +19,7 @@ from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
-from interface.models import Build, Repo
+from interface.models import Build, Repo, Result
 from interface.tasks import build_handler
 from interface.utils import get_github, get_page_number_list
 
@@ -175,6 +175,32 @@ def ProcessRepo(request, full_name):
     return redirect(url)
 
 
+@login_required
+def Rebuild(request, pk):
+    try:
+        build = Build.objects.get(id=pk)
+    except Build.DoesNotExist:
+        raise Http404('Build does not exist')
+
+    g = get_github(request.user)
+    grepo = g.get_repo(build.repo.full_name)
+
+    if not grepo.full_name:
+        raise Http404('Repo not found')
+
+    guser = g.get_user(request.user.username)
+    is_collab = grepo.has_in_collaborators(guser)
+
+    if not is_collab:
+        raise Http404('You are not a collaborator of this repo')
+
+    Result.objects.filter(build=build).delete()
+
+    django_rq.enqueue(build_handler, build.id)
+
+    return redirect(reverse('build_detail', kwargs={'pk': build.id}))
+
+
 @csrf_exempt
 def WebhookView(request):
     if 'HTTP_X_HUB_SIGNATURE' not in request.META:
@@ -198,9 +224,27 @@ def WebhookView(request):
     if 'ref' not in body or not body['head_commit']:
         return HttpResponse(status=204)
 
-    base_url = request.build_absolute_uri('/')[:-1]
+    try:
+        repo = Repo.objects.get(full_name=body['repository']['full_name'])
+    except Repo.DoesNotExist:
+        return 'Repo not registered'
 
-    django_rq.enqueue(build_handler, body, base_url)
+    auth = repo.user.get_auth()
+    if not auth:
+        return 'User for repo not logged in'
+
+    sha = body['head_commit']['id']
+    try:
+        build = Build.objects.get(sha=sha)
+    except:
+        branch = body['ref'].replace('refs/heads/', '')
+        build = Build.objects.create(
+            repo=repo,
+            ref=branch,
+            sha=sha
+        )
+
+    django_rq.enqueue(build_handler, build.id)
 
     return HttpResponse(status=202)
 

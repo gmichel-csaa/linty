@@ -1,76 +1,26 @@
-import os
-import shutil
-import subprocess
-
-import requests
-from django.core.urlresolvers import reverse
-from django.utils import timezone
-
-from interface import linters
-from interface.models import Build, Repo
+from interface.models import Build
 
 
-def build_handler(body, base_url):
+def build_handler(build_id):
     try:
-        repo = Repo.objects.get(full_name=body['repository']['full_name'])
-    except Repo.DoesNotExist:
-        return 'Repo not registered'
+        build = Build.objects.get(id=build_id)
+    except Build.DoesNotExist:
+        return 'Invalid build ID'
 
-    auth = repo.user.get_auth()
-    if not auth:
-        return 'User for repo not logged in'
+    auth = build.repo.user.get_auth()
+    try:
+        build.set_status(auth, Build.PENDING)
+        build.clone(auth)
+        passing = build.lint()
+        build.clean_directory()
 
-    # get necessary vars
-    clone_url = body['repository']['clone_url']
-    clone_url = clone_url.replace('github.com', '%s:%s@github.com' % auth)
-    branch = body['ref'].replace('refs/heads/', '')
-    sha = body['head_commit']['id']
-    status_url = body['repository']['statuses_url'].replace('{sha}', sha)
+        if passing:
+            build.set_status(auth, Build.SUCCESS)
+        else:
+            build.set_status(auth, Build.ERROR)
 
-    build = Build.objects.create(
-        repo=repo,
-        ref=branch,
-        sha=sha,
-        status=Build.PENDING
-    )
-
-    url = '{0}{1}'.format(base_url, reverse('build_detail', kwargs={'pk': build.id}))
-
-    def publish_status(state, description, target_url=None):
-        data = {
-            'state': state,
-            'description': description,
-            'target_url': target_url,
-            'context': 'linty'
-        }
-        requests.post(status_url, json=data, auth=auth)
-
-    publish_status('pending', 'Linting your code...', target_url=url)
-
-    # download repo
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-    directory = build.directory
-    if os.path.exists(directory):
-        shutil.rmtree(directory)
-    subprocess.call(['git', 'clone', clone_url, directory])
-    subprocess.call(['git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'fetch', clone_url])
-    subprocess.call(['git', '--git-dir=%s/.git' % directory, '--work-tree=%s' % directory, 'checkout', branch])
-
-    # run linting
-    passing = linters.lint(build)
-
-    # clean up
-    shutil.rmtree(build.directory)
-
-    if passing:
-        publish_status('success', 'Your code passed linting.', target_url=url)
-    else:
-        publish_status('error', 'Your code has lint failures. See Details.', target_url=url)
-
-    # update build record
-    build.status = 'success' if passing else 'error'
-    build.finished_at = timezone.now()
-    build.save()
-
-    return 'Build finished'
+        return 'Build finished'
+    except Exception as e:
+        print(e)
+        build.set_status(auth, Build.CANCELLED)
+        return 'Build failed'

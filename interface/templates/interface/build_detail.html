@@ -31,16 +31,22 @@
                 </div>
             </div>
         {% else %}
-            <div class="ui right item">
+            {% if DEBUG %}
+                <div class="ui right item">
+                <a href="{% url 'admin:login' %}" class="ui blue basic button">Log in</a>
+            </div>
+            {% else %}
+                <div class="ui right item">
                 <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
             </div>
+            {% endif %}
         {% endif %}
     </div>
 
     <div class="ui horizontal segments">
         <div class="ui segment">
-            <div class="ui text {% if object.status == 'success' %}green{% else %}red{% endif %}">
-                <i class="large icon {% if object.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+            <div class="ui text {% if object.status == 'success' %}green{% elif object.status == 'pending' %}yellow{% else %}red{% endif %}">
+                <i class="large icon {% if object.status == 'success' %}check{% elif object.status == 'pending' %}wait{% else %}warning circle{% endif %}"></i>
                 {{ object.status }}
             </div>
         </div>
@@ -61,6 +67,10 @@
             <i class="large icon clock"></i>
             {{ object.created_at|naturaltime }}
         </div>
+        <a class="ui segment" href="{% url 'rebuild' pk=object.id %}">
+            <i class="large icon repeat"></i>
+            Re-Run
+        </a>
     </div>
 
     {% for result in results %}
