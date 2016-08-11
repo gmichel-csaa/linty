@@ -22,9 +22,15 @@
                 </div>
             </div>
         {% else %}
-            <div class="ui right item">
+            {% if DEBUG %}
+                <div class="ui right item">
+                <a href="{% url 'admin:login' %}" class="ui blue basic button">Log in</a>
+            </div>
+            {% else %}
+                <div class="ui right item">
                 <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
             </div>
+            {% endif %}
         {% endif %}
     </div>
     <div class="ui container center aligned">
