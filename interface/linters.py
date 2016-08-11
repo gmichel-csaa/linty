@@ -51,7 +51,7 @@ def npm_lint(build, cwd):
 
     try:
         # TODO: only install whatever the linter needs
-        subprocess.call('npm install --ignore-scripts', cwd=cwd, shell=True, env=my_env)
+        subprocess.call('npm install --ignore-scripts --only=dev', cwd=cwd, shell=True, env=my_env)
         output = subprocess.check_output('npm run lint', cwd=cwd, shell=True, env=my_env)
         passing = True
     except subprocess.CalledProcessError as e:
