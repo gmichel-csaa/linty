@@ -9,7 +9,6 @@ def build_handler(build_id):
 
     auth = build.repo.user.get_auth()
     try:
-        build.set_status(auth, Build.PENDING)
         build.clone(auth)
         passing = build.lint()
         build.clean_directory()

@@ -182,6 +182,8 @@ def Rebuild(request, pk):
     except Build.DoesNotExist:
         raise Http404('Build does not exist')
 
+    build.set_status(auth, Build.PENDING)
+
     g = get_github(request.user)
     grepo = g.get_repo(build.repo.full_name)
 
@@ -244,6 +246,7 @@ def WebhookView(request):
             sha=sha
         )
 
+    build.set_status(auth, Build.PENDING)
     django_rq.enqueue(build_handler, build.id)
 
     return HttpResponse(status=202)
