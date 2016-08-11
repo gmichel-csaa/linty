@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^build/(?P<pk>[0-9]+)$', views.BuildDetailView.as_view(), name='build_detail'),
     url(r'^rebuild/(?P<pk>[0-9]+)$', views.Rebuild, name='rebuild'),
     url(r'^webhook$', views.WebhookView, name='webhook'),
+    url(r'^timeline$', views.TimelineView.as_view(), name='timeline'),
     url(r'^logout', views.LogoutView, name='logout'),
     url(r'^login', views.LoginView, name='login')
 ]

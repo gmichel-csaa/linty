@@ -66,7 +66,7 @@ class Repo(models.Model):
     def user_is_collaborator(self, user):
         if not user.is_authenticated():
             return False
-        if self.user == user:
+        if self.user == user or user.is_staff:
             return True
         g = get_github(user)
         grepo = g.get_repo(self.full_name)
@@ -184,8 +184,8 @@ class Build(models.Model):
     def lint(self):
         return linters.lint(self)
 
-    def get_issues(self, user):
-        g = get_github(user)
+    def get_issues(self):
+        g = get_github(self.repo.user)
         issues = g.search_issues('%s+repo:%s' % (self.short_sha, self.repo.full_name))
         return issues
 
