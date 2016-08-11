@@ -22,7 +22,7 @@ As long as you have a `requirements.txt` in the root of your project, Linty will
 
 **Javascript**:
 
-JS linting is still relatively new. In order to lint a JS project, you'll need a `package.json` in the root of your project, and you'll need to define a `lint` script in it. This means you can have Linty run whatever linter you want, you just have to get it working locally first. The linter will also need to return a non-zero status code when errors are found in order for Linty to register the run as a failure. There is no default linter for JS at the moment. Improvements to JS are coming.
+JS linting is still relatively new. In order to lint a JS project, you'll need a `package.json` in the root of your project, and you'll need to define a `lint` script in it. This means you can have Linty run whatever linter you want, you just have to get it working locally first. Linty will install your linter like so: `npm install --ignore-scripts --only=dev`, so make sure you have all your linter dependencies in `devDependencies`. The linter will also need to return a non-zero status code when errors are found in order for Linty to register the run as a failure. There is no default linter for JS at the moment. Improvements to JS are coming.
 Here's an example `package.json` for eslint:
 ```
 {
