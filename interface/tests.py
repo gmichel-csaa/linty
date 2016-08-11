@@ -131,20 +131,22 @@ class BuildDetailTests(LintTestCase):
 
     @mock.patch('interface.models.Build.get_issues')
     def test_build_detail_public_200(self, mock_get_issues):
-        mock_get_issues.return_value = []
+        mock_get_issues.return_value = type('test', (), {'totalCount': 0})
 
         self.repo.is_private = False
         self.repo.save()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
-    def test_build_detail_private_uauth_404(self):
+    @mock.patch('interface.models.Build.get_issues')
+    def test_build_detail_private_uauth_404(self, mock_get_issues):
+        mock_get_issues.return_value = type('test', (), {'totalCount': 0})
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
     @mock.patch('interface.models.Build.get_issues')
     def test_build_detail_owner_200(self, mock_get_issues):
-        mock_get_issues.return_value = []
+        mock_get_issues.return_value = type('test', (), {'totalCount': 0})
 
         self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
@@ -152,7 +154,7 @@ class BuildDetailTests(LintTestCase):
 
     @mock.patch('interface.models.Build.get_issues')
     def test_build_detail_contains_results(self, mock_get_issues):
-        mock_get_issues.return_value = []
+        mock_get_issues.return_value = type('test', (), {'totalCount': 0})
 
         self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
@@ -185,3 +187,22 @@ class BadgeTests(LintTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'image/svg+xml')
         self.assertIn('interface/badges/pass.svg', response.template_name)
+
+
+class TimelineTests(LintTestCase):
+    def setUp(self):
+        super(TimelineTests, self).setUp()
+        self.url = reverse('timeline')
+
+    def test_non_staff_302(self):
+        self.client.force_login(self.user, settings.AUTHENTICATION_BACKENDS[0])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_staff_200(self):
+        self.user.is_staff = True
+        self.user.save()
+        self.client.force_login(self.user, settings.AUTHENTICATION_BACKENDS[0])
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.build.id, response.content)

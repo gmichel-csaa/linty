@@ -271,7 +271,7 @@ class BadgeView(generic.DetailView):
         return ['interface/badges/unknown.svg']
 
 
-class TimelineView(generic.ListView, StaffRequiredMixin):
+class TimelineView(StaffRequiredMixin, generic.ListView):
     queryset = Build.objects.all().select_related('repo', 'repo__user').order_by('-created_at')[:500]
     template_name = 'interface/timeline.html'
 
