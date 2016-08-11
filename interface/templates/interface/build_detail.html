@@ -45,8 +45,8 @@
 
     <div class="ui horizontal segments">
         <div class="ui segment">
-            <div class="ui text {% if object.status == 'success' %}green{% else %}red{% endif %}">
-                <i class="large icon {% if object.status == 'success' %}check{% else %}warning circle{% endif %}"></i>
+            <div class="ui text {% if object.status == 'success' %}green{% elif object.status == 'pending' %}yellow{% else %}red{% endif %}">
+                <i class="large icon {% if object.status == 'success' %}check{% elif object.status == 'pending' %}wait{% else %}warning circle{% endif %}"></i>
                 {{ object.status }}
             </div>
         </div>
