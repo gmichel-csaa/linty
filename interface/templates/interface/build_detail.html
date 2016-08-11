@@ -78,7 +78,7 @@
             <div class="ui styled fluid accordion">
                 <div class="title {{ output|yesno:"active," }}">
                     <i class="dropdown icon"></i>
-                    {{ result.linter }}
+                    {{ result.get_linter_display }}
                 </div>
                 <div class="content {{ output|yesno:"active," }}">
                     <div class="ui form transition {{ output|yesno:",hidden" }}">
