@@ -30,7 +30,7 @@
 body > .ui.text.container {
     max-width: 800px !important;
 }
-textarea {
+textarea.output {
     font-family: monospace;
-    font-size: 12px;
+    font-size: 12px !important;
 }
