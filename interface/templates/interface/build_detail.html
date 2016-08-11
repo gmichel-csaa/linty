@@ -95,5 +95,8 @@
 {% block extra_js %}
     <script type="text/javascript">
         $('.ui.accordion').accordion();
+        $("textarea").each(function () {
+            this.style.height = (this.scrollHeight)+'px';
+        });
     </script>
 {% endblock %}

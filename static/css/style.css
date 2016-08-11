@@ -27,3 +27,10 @@
     margin-top: 0.5em;
     padding-left: 0;
 }
+body > .ui.text.container {
+    max-width: 800px !important;
+}
+textarea {
+    font-family: monospace;
+    font-size: 12px;
+}
