@@ -39,6 +39,9 @@ class Repo(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.full_name
+
     @property
     def clone_url(self):
         return 'https://github.com/{}.git'.format(self.full_name)
@@ -113,6 +116,9 @@ class Build(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return self.short_sha
+
     @property
     def status_url(self):
         return 'https://api.github.com/repos/{full_name}/statuses/{sha}'.format(
@@ -148,7 +154,8 @@ class Build(models.Model):
         if self.status != state:
             self.status = state
             self.save()
-        self.publish_status(auth, state, message)
+        if not settings.DEBUG:
+            self.publish_status(auth, state, message)
 
     def clone(self, auth):
         clone_url = self.repo.clone_url

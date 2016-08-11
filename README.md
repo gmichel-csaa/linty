@@ -12,7 +12,31 @@ Features:
 * Pass/Fail Badges for your READMEs
 * Proper permissions for private repos
 
-The app is live at [lintyapp.com](https://www.lintyapp.com).
+The app is live at [lintyapp.com](https://www.lintyapp.com). Linty is still under heavy development, and is likely to change often and significantly. Things might break. Use with discretion.
+
+### Setup
+
+**Python**:
+
+As long as you have a `requirements.txt` in the root of your project, Linty will run [pycodestyle](https://github.com/PyCQA/pycodestyle) against your project. You can configure pycodestyle using a `setup.cfg` file in the root of the project. See [ours](https://github.com/ZeroCater/linty/blob/master/setup.cfg) for an example.
+
+**Javascript**:
+
+JS linting is still relatively new. In order to lint a JS project, you'll need a `package.json` in the root of your project, and you'll need to define a `lint` script in it. This means you can have Linty run whatever linter you want, you just have to get it working locally first. Linty will install your linter like so: `npm install --ignore-scripts --only=dev`, so make sure you have all your linter dependencies in `devDependencies`. The linter will also need to return a non-zero status code when errors are found in order for Linty to register the run as a failure. There is no default linter for JS at the moment. Improvements to JS are coming.
+Here's an example `package.json` for eslint:
+```
+{
+  ...
+  "scripts": {
+    "lint:": "eslint .",
+    ...
+  },
+  "devDependencies": {
+    ...
+    "eslint": "^2.13.1",
+  }
+}
+```
 
 ### Development
 
