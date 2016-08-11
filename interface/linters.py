@@ -30,6 +30,7 @@ def lint(build):
 
 
 def pycodestyle(build, cwd):
+    # TODO: Allow the user to specify their preferred version of pycodestyle
     try:
         output = subprocess.check_output(['pycodestyle', cwd])
         passing = True
@@ -49,7 +50,8 @@ def npm_lint(build, cwd):
     my_env["PATH"] = "/usr/local/bin:" + my_env["PATH"]
 
     try:
-        subprocess.call('npm install', cwd=cwd, shell=True, env=my_env)
+        # TODO: only install whatever the linter needs
+        subprocess.call('npm install --ignore-scripts', cwd=cwd, shell=True, env=my_env)
         output = subprocess.check_output('npm run lint', cwd=cwd, shell=True, env=my_env)
         passing = True
     except subprocess.CalledProcessError as e:
