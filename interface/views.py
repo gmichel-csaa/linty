@@ -19,6 +19,7 @@ from github import UnknownObjectException, BadCredentialsException
 from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
+from interface.mixins import StaffRequiredMixin
 from interface.models import Build, Repo, Result
 from interface.tasks import build_handler
 from interface.utils import get_github, get_page_number_list
@@ -33,7 +34,8 @@ class BuildDetailView(generic.DetailView):
         context['repo'] = self.object.repo
         is_collab = context['repo'].user_is_collaborator(request.user)
         context['is_owner'] = is_collab
-        context['issues'] = self.object.get_issues(request.user)
+        issues = self.object.get_issues()
+        context['issues'] = issues if issues.totalCount > 0 else False
 
         if context['repo'].is_private and not is_collab:
             raise Http404('You are not allowed to view this Build')
@@ -184,17 +186,18 @@ def Rebuild(request, pk):
 
     build.set_status(auth, Build.PENDING)
 
-    g = get_github(request.user)
-    grepo = g.get_repo(build.repo.full_name)
+    if not request.user.is_staff:
+        g = get_github(request.user)
+        grepo = g.get_repo(build.repo.full_name)
 
-    if not grepo.full_name:
-        raise Http404('Repo not found')
+        if not grepo.full_name:
+            raise Http404('Repo not found')
 
-    guser = g.get_user(request.user.username)
-    is_collab = grepo.has_in_collaborators(guser)
+        guser = g.get_user(request.user.username)
+        is_collab = grepo.has_in_collaborators(guser)
 
-    if not is_collab:
-        raise Http404('You are not a collaborator of this repo')
+        if not is_collab:
+            raise Http404('You are not a collaborator of this repo')
 
     Result.objects.filter(build=build).delete()
 
@@ -266,6 +269,39 @@ class BadgeView(generic.DetailView):
             elif build.status == 'error':
                 return ['interface/badges/fail.svg']
         return ['interface/badges/unknown.svg']
+
+
+class TimelineView(StaffRequiredMixin, generic.ListView):
+    def get_queryset(self):
+        builds = Build.objects \
+             .select_related('repo') \
+             .order_by('-created_at') \
+             .values('id', 'repo__full_name', 'created_at', 'finished_at')[:500]
+        repos = Repo.objects \
+            .order_by('-created_at') \
+            .values('id', 'full_name', 'created_at')[:500]
+
+        object_list = [
+            {
+                'id': obj['id'],
+                'type': 'build',
+                'repo_name': obj['repo__full_name'],
+                'created_at': obj['created_at'],
+                'finished_at': obj['finished_at']
+            } for obj in builds
+        ]
+        object_list.extend([
+            {
+                'id': obj['id'],
+                'type': 'repo',
+                'full_name': obj['full_name'],
+                'created_at': obj['created_at']
+            } for obj in repos
+        ])
+        object_list.sort(key=lambda i: i['created_at'], reverse=True)
+        return object_list[:500]
+
+    template_name = 'interface/timeline.html'
 
 
 def LoginView(request):

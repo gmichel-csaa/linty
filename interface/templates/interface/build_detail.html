@@ -26,8 +26,10 @@
                 {{ user.username }}
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}"
-                       class="item">Log Out</a>
+                    {% if user.is_staff %}
+                        <a class="item" href="{% url 'timeline' %}">Timeline</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
                 </div>
             </div>
         {% else %}

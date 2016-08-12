@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Linty - Timeline{% endblock %}
+
+{% block body %}
+    <div class="ui text menu">
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                <i class="right chevron icon divider"></i>
+                <div class="active section">Timeline</div>
+            </div>
+        </div>
+        <div class="ui right dropdown item">
+            {{ user.username }}
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <a class="item" href="{% url 'timeline' %}">Timeline</a>
+                <a href="{% url 'logout' %}{% if not repo.is_private or is_owner %}?next={{ request.path }}{% endif %}" class="item">Log Out</a>
+            </div>
+        </div>
+    </div>
+
+    <h2>Timeline</h2>
+
+    <div class="ui feed large">
+        {% for obj in object_list %}
+            <div class="event">
+                <div class="label">
+                    <i class="icon plus"></i>
+                </div>
+                <div class="content">
+                    <div class="summary">
+                        {% if obj.type == 'build' %}
+                        A new <a href="{% url 'build_detail' pk=obj.id %}">build</a> was added to
+                        <a href="{% url 'repo_detail' full_name=obj.repo_name %}">{{ obj.repo_name }}</a>
+                        {% elif obj.type == 'repo' %}
+                        A new <a href="{% url 'repo_detail' full_name=obj.full_name %}">repo</a> was added.
+                        {% endif %}
+                    </div>
+                    <div class="date">
+                        {% if obj.type == 'build' %}
+                        Started {{ obj.created_at|naturaltime }}{% if obj.finished_at %}, Finished {{ obj.finished_at|naturaltime }}{% endif %}
+                        {% elif obj.type == 'repo' %}
+                        Added {{ obj.created_at|naturaltime }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
