@@ -41,24 +41,31 @@
     </div>
 
     {% if is_owner %}
-        <div class="ui text menu">
-            <div class="ui item">
-                <img class="linty-badge" src="{{ badge_url }}"/>
-                <div class="ui action input">
-                    <input id="badge_input" type="text" readonly
-                           value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+    <div class="ui divider"></div>
+        <div class="ui form">
+            <div class="inline fields">
+                <div class="three wide field">
                     <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
                             data-variation="inverted" data-position="top center">
                         <i class="copy icon"></i>
                     </button>
+                    <input id="badge_input" type="text" readonly
+                           value="[![Linty]({{ badge_url }})]({{ absolute_url }})" style="display: none;">
+                    <label>Get Badge</label>
                 </div>
-            </div>
-            <div class="ui right item">
-                <div id="stop_linting" class="ui red button">
-                    Stop Linting this Repo
+                <div class="seven wide field"></div>
+                <div class="three wide field ui checkbox">
+                    <input type="checkbox" tabindex="0" class="hidden" checked />
+                    <label>Status Checks</label>
+                </div>
+                <div class="five wide field">
+                    <div id="stop_linting" class="ui red button">
+                        Stop Linting this Repo
+                    </div>
                 </div>
             </div>
         </div>
+    <div class="ui divider"></div>
     {% endif %}
 
     <h2 class="ui header">

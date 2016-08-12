@@ -60,9 +60,7 @@ class RepoDetailView(generic.DetailView):
         if self.object.is_private and not is_collab:
             raise Http404('You are not allowed to view this Repo')
 
-        url = reverse('badge', kwargs={'full_name': self.object.full_name})
         context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
-        context['badge_url'] = self.request.build_absolute_uri(url)
 
         ref = request.GET.get('ref', False)
         context['ref'] = ref
