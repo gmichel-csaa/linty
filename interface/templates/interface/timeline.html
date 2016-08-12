@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <h2>Timeline (Last 500 builds)</h2>
+    <h2>Timeline</h2>
 
     <div class="ui feed large">
         {% for obj in object_list %}
@@ -32,11 +32,19 @@
                 </div>
                 <div class="content">
                     <div class="summary">
+                        {% if obj.type == 'build' %}
                         A new <a href="{% url 'build_detail' pk=obj.id %}">build</a> was added to
-                        <a href="{% url 'repo_detail' full_name=obj.repo.full_name %}">{{ obj.repo.full_name }}</a>
+                        <a href="{% url 'repo_detail' full_name=obj.repo_name %}">{{ obj.repo_name }}</a>
+                        {% elif obj.type == 'repo' %}
+                        A new <a href="{% url 'repo_detail' full_name=obj.full_name %}">repo</a> was added.
+                        {% endif %}
                     </div>
                     <div class="date">
+                        {% if obj.type == 'build' %}
                         Started {{ obj.created_at|naturaltime }}{% if obj.finished_at %}, Finished {{ obj.finished_at|naturaltime }}{% endif %}
+                        {% elif obj.type == 'repo' %}
+                        Added {{ obj.created_at|naturaltime }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
