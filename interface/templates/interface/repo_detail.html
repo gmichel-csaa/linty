@@ -89,7 +89,10 @@
                         <a class="build_link" href="{% url 'build_detail' pk=build.pk %}">{{ build.short_sha }}</a>
                     </td>
                     <td>
-                        <a href="{% url 'repo_detail' full_name=object.full_name %}?ref={{ build.ref }}">{{ build.ref }}</a>
+                        <a class="ui label" href="{% url 'repo_detail' full_name=object.full_name %}?ref={{ build.ref }}">
+                            <i class="icon filter"></i>
+                            {{ build.ref }}
+                        </a>
                     </td>
                     <td>{{ build.created_at|naturaltime }}</td>
                 </tr>
