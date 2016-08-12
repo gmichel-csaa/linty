@@ -1,7 +1,3 @@
-.linty-badge {
-    width: 72px!important;
-    margin-right: 1em!important;
-}
 .ui.text.red {
     color: #db2828!important;
 }
@@ -33,4 +29,7 @@ body > .ui.text.container {
 textarea.output {
     font-family: monospace;
     font-size: 12px !important;
+}
+.left.aligned.button {
+    float: left;
 }

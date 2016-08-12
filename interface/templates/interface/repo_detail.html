@@ -41,41 +41,23 @@
     </div>
 
     {% if is_owner %}
-    <div class="ui divider"></div>
-        <div class="ui form">
-            <div class="inline fields">
-                <div class="three wide field">
-                    <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
-                            data-variation="inverted" data-position="top center">
-                        <i class="copy icon"></i>
-                    </button>
-                    <input id="badge_input" type="text" readonly
-                           value="[![Linty]({{ badge_url }})]({{ absolute_url }})" style="display: none;">
-                    <label>Get Badge</label>
-                </div>
-                <div class="one wide field"></div>
-                <div class="seven wide field">
-                    <select name="default_branch" id="default_branch">
-                        {% for branch in branches %}
-                            <option value="{{ branch }}">{{ branch }}</option>
-                        {% endfor %}
-                    </select>
-                    <label for="default_branch">Default Branch</label>
-                </div>
-                <div class="three wide field ui checkbox">
-                    <input name="statuses" id="statuses" type="checkbox" tabindex="0" class="hidden" checked />
-                    <label for="statuses">Status Checks</label>
-                </div>
-                <div class="five wide field">
-                    <div id="stop_linting" class="ui red button">
-                        Stop Linting this Repo
-                    </div>
-                </div>
+        <div class="ui text menu">
+            <div class="ui item">
+            <h2>
+                {% if ref %}
+                    ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
+                {% else %}
+                    All Builds
+                {% endif %}
+            </h2>
+            </div>
+            <div class="ui right item">
+                <button id="settings" class="ui icon right aligned big basic black button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
+                    <i class="icon setting"></i>
+                </button>
             </div>
         </div>
-    <div class="ui divider"></div>
-    {% endif %}
-
+    {% else %}
     <h2 class="ui header">
         {% if ref %}
             ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
@@ -83,6 +65,7 @@
             All Builds
         {% endif %}
     </h2>
+    {% endif %}
     {% if builds %}
         <table class="ui very basic selectable table">
             <thead>
@@ -141,6 +124,55 @@
             </div>
         </div>
     </div>
+
+    <div id="settings_modal" class="ui small modal">
+        <div class="header">
+            Repository Settings
+        </div>
+        <div class="content">
+            <form action="" method="POST" class="ui form">
+                <div class="fields">
+                    <div class="eight wide field">
+                        <label for="default_branch">Default Branch</label>
+                        <select name="default_branch" id="default_branch" class=" ui search dropdown">
+                            {% for branch in branches %}
+                                <option value="{{ branch }}">{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="eight wide field">
+                        <label for="badge_input">Badge Markdown</label>
+                        <div class="ui action input">
+                            <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+                            <button class="ui blue icon button copy_button right labeled" data-clipboard-target="#badge_input" data-variation="inverted" data-position="top center">
+                                <i class="copy icon"></i>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui toggle checkbox">
+                        <input name="statuses" id="statuses" type="checkbox" checked="" />
+                        <label for="statuses">Publish Commit Statuses on GitHub</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui left aligned red button" id="stop_linting">
+                Stop Linting
+            </div>
+            <div class="ui gray cancel button">
+                <i class="remove icon"></i>
+                Cancel
+            </div>
+            <div id="confirm_button" class="ui green ok button">
+                <i class="checkmark icon"></i>
+                Save
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
@@ -150,6 +182,11 @@
         $.fn.api.settings.api = {
             'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
         };
+        $('select.dropdown').dropdown();
+        $('#settings_modal').modal({'autofocus': false});
+        $('#settings').on('click', function(){
+           $('#settings_modal').modal('show');
+        });
     </script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}
