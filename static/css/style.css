@@ -33,3 +33,6 @@ textarea.output {
 .left.aligned.button {
     float: left;
 }
+.build_row {
+    cursor: pointer;
+}

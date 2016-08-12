@@ -76,3 +76,6 @@ $('#settings_modal').modal({
 $('#settings').on('click', function(){
    $('#settings_modal').modal('show');
 });
+$('.build_row').on('click', function(){
+  window.location = this.querySelector('.build_link').href;
+});
