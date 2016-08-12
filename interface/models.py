@@ -36,30 +36,37 @@ class Repo(models.Model):
     full_name = models.TextField(unique=True)
     webhook_id = models.IntegerField(null=True, blank=True)
     is_private = models.BooleanField(default=True)
+    default_branch = models.TextField(default='master')
 
+    disabled = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.full_name
+
+    def get_absolute_url(self):
+        return reverse('repo_detail', kwargs={'full_name': self.full_name})
 
     @property
     def clone_url(self):
         return 'https://github.com/{}.git'.format(self.full_name)
 
     def get_head_build(self):
-        return Build.objects.filter(repo=self, ref='master').only('status').first()
+        return Build.objects.filter(repo=self, ref=self.default_branch).only('status').first()
 
     def soft_delete(self):
-        g = get_github(self.user)
-        grepo = g.get_repo(self.full_name)
+        self.webhook_id = None
+        self.disabled = True
 
-        try:
-            assert self.webhook_id
-            hook = grepo.get_hook(self.webhook_id)
-            hook.delete()
-            self.webhook_id = None
-        except (UnknownObjectException, AssertionError):
-            pass
+        if not settings.DEBUG:
+            g = get_github(self.user)
+            grepo = g.get_repo(self.full_name)
+
+            try:
+                hook = grepo.get_hook(self.webhook_id)
+                hook.delete()
+            except UnknownObjectException:
+                pass
 
         self.save()
 
@@ -74,6 +81,8 @@ class Repo(models.Model):
         return grepo.has_in_collaborators(guser)
 
     def add_webhook(self, request):
+        if settings.DEBUG:
+            return
         g = get_github(request.user)
         grepo = g.get_repo(self.full_name)
 
@@ -89,7 +98,6 @@ class Repo(models.Model):
         )
 
         self.webhook_id = hook.id
-        self.is_private = grepo.private
         self.save()
 
     class Meta:
@@ -154,7 +162,7 @@ class Build(models.Model):
         if self.status != state:
             self.status = state
             self.save()
-        if not settings.DEBUG:
+        if not settings.DEBUG and self.repo.webhook_id:
             self.publish_status(auth, state, message)
 
     def clone(self, auth):

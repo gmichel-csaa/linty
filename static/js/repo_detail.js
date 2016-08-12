@@ -2,13 +2,11 @@ var copyButton = new Clipboard('.copy_button');
 var btns = document.querySelectorAll('.copy_button');
 for (var i = 0; i < btns.length; i++) {
   btns[i].addEventListener('mouseleave', function (e) {
-    $('.copy_button').popup('hide');
-    e.currentTarget.removeAttribute('data-content');
+    e.currentTarget.removeAttribute('data-tooltip');
   });
 }
 function showTooltip(elem, msg) {
-  elem.setAttribute('data-content', msg);
-  $('.copy_button').popup('show');
+  elem.setAttribute('data-tooltip', msg);
 }
 function fallbackMessage(action) {
   var actionMsg = '';
@@ -61,4 +59,18 @@ $('#stop_linting').on('click', function (e) {
       return false;
     }
   }).modal('show');
+});
+
+ $.fn.api.settings.api = {
+    'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
+};
+$('select.dropdown').dropdown();
+$('#settings_modal').modal({'autofocus': false});
+$('#settings').on('click', function(){
+   $('#settings_modal').modal('show');
+});
+$('#save_button').on('click', function(e) {
+  e.preventDefault();
+  $('#save_button').addClass('loading');
+  $('#settings_form').submit();
 });

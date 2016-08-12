@@ -108,7 +108,7 @@ class RepoDeleteTests(LintTestCase):
 
     def test_repo_delete_unauth_404(self):
         response = self.client.get(self.url)
-        self.assertIsNotNone(self.repo.webhook_id)
+        self.assertIsNotNone(self.repo.disabled)
         self.assertEqual(response.status_code, 404)
 
     # Disabled because requires OAuth

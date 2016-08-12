@@ -45,10 +45,13 @@ class BuildDetailView(generic.DetailView):
         return self.render_to_response(context)
 
 
-class RepoDetailView(generic.DetailView):
+class RepoDetailView(generic.DetailView, generic.UpdateView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
+    template_name = 'interface/repo_detail.html'
+
+    fields = ['default_branch']
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -64,9 +67,9 @@ class RepoDetailView(generic.DetailView):
             url = reverse('badge', kwargs={'full_name': self.object.full_name})
             context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
             context['badge_url'] = self.request.build_absolute_uri(url)
-            branches = Build.objects.filter(repo=self.object).values_list('ref')
-            context['branches'] = { branch[0] for branch in branches }
-
+            g = get_github(self.object.user)
+            grepo = g.get_repo(self.object.full_name)
+            context['branches'] = [i.name for i in grepo.get_branches()]
 
         ref = request.GET.get('ref', False)
         context['ref'] = ref
@@ -91,6 +94,11 @@ class RepoDetailView(generic.DetailView):
 
         return self.render_to_response(context)
 
+    # def post(self, request, *args, **kwargs):
+    #     self.object = self.get_object()
+    #     # TODO if statuses changed, add/delete webhook
+    #     return super(RepoDetailView, self).post(request, *args, **kwargs)
+
 
 class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
@@ -105,7 +113,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
 
         self.object_list = Repo.objects.filter(
             full_name__in=[i.full_name for i in repos],
-            webhook_id__isnull=False
+            disabled=False
         ).annotate(builds_count=Count('builds'))
 
         names = [x.full_name for x in self.object_list]
@@ -161,6 +169,9 @@ def ProcessRepo(request, full_name):
 
     try:
         repo = Repo.objects.get(full_name=grepo.full_name)
+        repo.disabled = False
+        repo.is_private = grepo.private
+        repo.save()
     except Repo.DoesNotExist:
         repo = None
 
@@ -169,7 +180,7 @@ def ProcessRepo(request, full_name):
             raise Http404('You are not a collaborator of this repo')
     else:
         if not repo:
-            repo = Repo.objects.create(full_name=grepo.full_name, user=user)
+            repo = Repo.objects.create(full_name=grepo.full_name, user=user, default_branch=grepo.default_branch)
 
         if not repo.webhook_id:
             try:

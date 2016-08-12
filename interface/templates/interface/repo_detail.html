@@ -130,30 +130,31 @@
             Repository Settings
         </div>
         <div class="content">
-            <form action="" method="POST" class="ui form">
+            <form id="settings_form" action="" method="POST" class="ui form">
+                {% csrf_token %}
                 <div class="fields">
                     <div class="eight wide field">
                         <label for="default_branch">Default Branch</label>
                         <select name="default_branch" id="default_branch" class=" ui search dropdown">
                             {% for branch in branches %}
-                                <option value="{{ branch }}">{{ branch }}</option>
+                                <option value="{{ branch }}" {% if object.default_branch == branch %}selected=""{% endif %}>{{ branch }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="eight wide field">
                         <label for="badge_input">Badge Markdown</label>
                         <div class="ui action input">
-                            <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-                            <button class="ui blue icon button copy_button right labeled" data-clipboard-target="#badge_input" data-variation="inverted" data-position="top center">
+                            <input id="badge_input" type="text" readonly value="![Linty]({{ badge_url }})]({{ absolute_url }})">
+                            <div class="ui blue icon button copy_button right labeled" data-clipboard-target="#badge_input" data-inverted="">
                                 <i class="copy icon"></i>
                                 Copy
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui toggle checkbox">
-                        <input name="statuses" id="statuses" type="checkbox" checked="" />
+                        <input name="statuses" id="statuses" type="checkbox" {% if object.webhook_id %}checked=""{% endif %} />
                         <label for="statuses">Publish Commit Statuses on GitHub</label>
                     </div>
                 </div>
@@ -167,7 +168,7 @@
                 <i class="remove icon"></i>
                 Cancel
             </div>
-            <div id="confirm_button" class="ui green ok button">
+            <div id="save_button" class="ui green ok button">
                 <i class="checkmark icon"></i>
                 Save
             </div>
@@ -176,17 +177,6 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
-    <script type="text/javascript">
-        $.fn.api.settings.api = {
-            'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
-        };
-        $('select.dropdown').dropdown();
-        $('#settings_modal').modal({'autofocus': false});
-        $('#settings').on('click', function(){
-           $('#settings_modal').modal('show');
-        });
-    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}
