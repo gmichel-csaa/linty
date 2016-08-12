@@ -20,7 +20,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 from social.apps.django_app.views import auth
 
 from interface.mixins import StaffRequiredMixin
-from interface.models import Build, Repo, Result
+from interface.models import Build, Repo, Result, UserProxy
 from interface.tasks import build_handler
 from interface.utils import get_github, get_page_number_list
 
@@ -300,6 +300,13 @@ class TimelineView(StaffRequiredMixin, generic.ListView):
         ])
         object_list.sort(key=lambda i: i['created_at'], reverse=True)
         return object_list[:500]
+
+    def get_context_data(self, **kwargs):
+        context = super(TimelineView, self).get_context_data(**kwargs)
+        context['user_count'] = UserProxy.objects.count()
+        context['repo_count'] = Repo.objects.count()
+        context['build_count'] = Build.objects.count()
+        return context
 
     template_name = 'interface/timeline.html'
 

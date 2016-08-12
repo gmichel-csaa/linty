@@ -22,7 +22,20 @@
         </div>
     </div>
 
-    <h2>Timeline</h2>
+    <div class="ui statistics three">
+        <div class="ui statistic">
+            <div class="value">{{ user_count }}</div>
+            <div class="label">Users</div>
+        </div>
+        <div class="ui statistic">
+            <div class="value">{{ repo_count }}</div>
+            <div class="label">Repos</div>
+        </div>
+        <div class="ui statistic">
+            <div class="value">{{ build_count }}</div>
+            <div class="label">Builds</div>
+        </div>
+    </div>
 
     <div class="ui feed large">
         {% for obj in object_list %}
