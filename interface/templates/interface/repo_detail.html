@@ -53,10 +53,18 @@
                            value="[![Linty]({{ badge_url }})]({{ absolute_url }})" style="display: none;">
                     <label>Get Badge</label>
                 </div>
-                <div class="seven wide field"></div>
+                <div class="one wide field"></div>
+                <div class="seven wide field">
+                    <select name="default_branch" id="default_branch">
+                        {% for branch in branches %}
+                            <option value="{{ branch }}">{{ branch }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="default_branch">Default Branch</label>
+                </div>
                 <div class="three wide field ui checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden" checked />
-                    <label>Status Checks</label>
+                    <input name="statuses" id="statuses" type="checkbox" tabindex="0" class="hidden" checked />
+                    <label for="statuses">Status Checks</label>
                 </div>
                 <div class="five wide field">
                     <div id="stop_linting" class="ui red button">

@@ -60,7 +60,13 @@ class RepoDetailView(generic.DetailView):
         if self.object.is_private and not is_collab:
             raise Http404('You are not allowed to view this Repo')
 
-        context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
+        if is_collab:
+            url = reverse('badge', kwargs={'full_name': self.object.full_name})
+            context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
+            context['badge_url'] = self.request.build_absolute_uri(url)
+            branches = Build.objects.filter(repo=self.object).values_list('ref')
+            context['branches'] = { branch[0] for branch in branches }
+
 
         ref = request.GET.get('ref', False)
         context['ref'] = ref
