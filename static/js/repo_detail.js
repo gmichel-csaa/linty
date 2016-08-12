@@ -65,12 +65,14 @@ $('#stop_linting').on('click', function (e) {
     'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
 };
 $('select.dropdown').dropdown();
-$('#settings_modal').modal({'autofocus': false});
+$('#settings_modal').modal({
+  'autofocus': false,
+  'onApprove': function() {
+    $('#save_button').addClass('loading');
+    $('#settings_form').submit().find('.field').addClass('disabled');
+    return false;
+  }
+});
 $('#settings').on('click', function(){
    $('#settings_modal').modal('show');
-});
-$('#save_button').on('click', function(e) {
-  e.preventDefault();
-  $('#save_button').addClass('loading');
-  $('#settings_form').submit();
 });

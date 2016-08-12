@@ -52,7 +52,7 @@
             </h2>
             </div>
             <div class="ui right item">
-                <button id="settings" class="ui icon right aligned big basic black button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
+                <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
                     <i class="icon setting"></i>
                 </button>
             </div>
@@ -144,7 +144,7 @@
                     <div class="eight wide field">
                         <label for="badge_input">Badge Markdown</label>
                         <div class="ui action input">
-                            <input id="badge_input" type="text" readonly value="![Linty]({{ badge_url }})]({{ absolute_url }})">
+                            <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
                             <div class="ui blue icon button copy_button right labeled" data-clipboard-target="#badge_input" data-inverted="">
                                 <i class="copy icon"></i>
                                 Copy
@@ -153,8 +153,8 @@
                     </div>
                 </div>
                 <p>
-                    You may copy the markdown above and place it in your repo's README.md file to get a badge showing the pass/fail status of your default branch.
-                    The badge will link to this page. Here is what this repo's badge looks like:
+                    Copy the markdown above and place it in your repo's <b>README.md</b> file to get a badge showing the status of the latest commit to your default branch.
+                    The badge will link to your repo on Linty. Here is this repo's badge:
                 </p>
                 <img class="ui image centered" src="{{ badge_url }}" alt="badge">
                 <h4 class="ui horizontal divider header">
@@ -167,21 +167,21 @@
                     </div>
                 </div>
                 <p>
-                    Status Checks show in pull requests and next to commits on GitHub, and say if a commit passed or failed linting.<br/>
+                    Status Checks show in pull requests and next to commits on GitHub and say if a commit passed or failed linting.<br/>
                     You can enforce style code adherence by making Linty a <a target="_blank" href="https://help.github.com/articles/enabling-required-status-checks/">required status check</a>.
                     Here is what it looks like:
                 </p>
                 <img src="{% static 'img/status.png' %}" alt="status" class="ui image centered">
+                <h4 class="ui horizontal divider header">
+                  Permissions
+                </h4>
+                <p>
+                    Linty respects the same permissions as GitHub. If your repo is public, then this repo's builds are public.
+                    However, only collaborators may access these settings.
+                    If your repo is private, only collaborators of the repository can see the builds.<br/>
+                    Linty staff may see all pages, for support purposes.
+                </p>
             </form>
-            <h4 class="ui horizontal divider header">
-              Permissions
-            </h4>
-            <p>
-                Linty respects the same permissions as GitHub. If your repo is public, then this page and all builds are public.
-                However, only collaborators may access these settings.
-                If your repo is private, only collaborators of the repository can see this page or any builds.
-                Linty staff may see all pages, for support purposes.
-            </p>
         </div>
         <div class="actions">
             <div class="ui left aligned red button" id="stop_linting">
