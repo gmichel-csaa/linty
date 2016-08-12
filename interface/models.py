@@ -55,9 +55,10 @@ class Repo(models.Model):
         return Build.objects.filter(repo=self, ref=self.default_branch).only('status').first()
 
     def soft_delete(self):
-        self.webhook_id = None
         self.disabled = True
+        self.remove_webhook()
 
+    def remove_webhook(self):
         if not settings.DEBUG:
             g = get_github(self.user)
             grepo = g.get_repo(self.full_name)
@@ -68,6 +69,7 @@ class Repo(models.Model):
             except UnknownObjectException:
                 pass
 
+        self.webhook_id = None
         self.save()
 
     def user_is_collaborator(self, user):
@@ -82,22 +84,23 @@ class Repo(models.Model):
 
     def add_webhook(self, request):
         if settings.DEBUG:
-            return
-        g = get_github(request.user)
-        grepo = g.get_repo(self.full_name)
+            self.webhook_id = 123
+        else:
+            g = get_github(self.user)
+            grepo = g.get_repo(self.full_name)
 
-        hook = grepo.create_hook(
-            'web',
-            {
-                'content_type': 'json',
-                'url': request.build_absolute_uri(reverse('webhook')),
-                'secret': settings.WEBHOOK_SECRET
-            },
-            events=['push'],
-            active=True
-        )
+            hook = grepo.create_hook(
+                'web',
+                {
+                    'content_type': 'json',
+                    'url': request.build_absolute_uri(reverse('webhook')),
+                    'secret': settings.WEBHOOK_SECRET
+                },
+                events=['push'],
+                active=True
+            )
+            self.webhook_id = hook.id
 
-        self.webhook_id = hook.id
         self.save()
 
     class Meta:

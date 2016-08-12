@@ -94,10 +94,20 @@ class RepoDetailView(generic.DetailView, generic.UpdateView):
 
         return self.render_to_response(context)
 
-    # def post(self, request, *args, **kwargs):
-    #     self.object = self.get_object()
-    #     # TODO if statuses changed, add/delete webhook
-    #     return super(RepoDetailView, self).post(request, *args, **kwargs)
+    def form_valid(self, form):
+        self.object = self.get_object()
+        redirect = super(RepoDetailView, self).form_valid(form)
+        statuses = self.request.POST.get('statuses', False)
+        if statuses == 'on' and not self.object.webhook_id:
+            self.object.add_webhook(self.request)
+        elif not statuses and self.object.webhook_id:
+            self.object.remove_webhook()
+        return redirect
+
+    def form_invalid(self, form):
+        # TODO: Submit form via ajax, show error message if invalid
+        # I have no idea how someone would submit an invalid form
+        return render(self.request, 'interface/500.html')
 
 
 class RepoListView(LoginRequiredMixin, generic.ListView):
