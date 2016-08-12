@@ -43,24 +43,21 @@
     {% if is_owner %}
         <div class="ui text menu">
             <div class="ui item">
-                <img class="linty-badge" src="{{ badge_url }}"/>
-                <div class="ui action input">
-                    <input id="badge_input" type="text" readonly
-                           value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
-                    <button class="ui teal right icon button copy_button" data-clipboard-target="#badge_input"
-                            data-variation="inverted" data-position="top center">
-                        <i class="copy icon"></i>
-                    </button>
-                </div>
+            <h2>
+                {% if ref %}
+                    ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
+                {% else %}
+                    All Builds
+                {% endif %}
+            </h2>
             </div>
             <div class="ui right item">
-                <div id="stop_linting" class="ui red button">
-                    Stop Linting this Repo
-                </div>
+                <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
+                    <i class="icon setting"></i>
+                </button>
             </div>
         </div>
-    {% endif %}
-
+    {% else %}
     <h2 class="ui header">
         {% if ref %}
             ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
@@ -68,6 +65,7 @@
             All Builds
         {% endif %}
     </h2>
+    {% endif %}
     {% if builds %}
         <table class="ui very basic selectable table">
             <thead>
@@ -126,15 +124,82 @@
             </div>
         </div>
     </div>
+
+    <div id="settings_modal" class="ui small modal">
+        <div class="header">
+            Repository Settings
+        </div>
+        <div class="content">
+            <form id="settings_form" action="" method="POST" class="ui form">
+                {% csrf_token %}
+                <div class="fields">
+                    <div class="eight wide field">
+                        <label for="default_branch">Default Branch</label>
+                        <select name="default_branch" id="default_branch" class=" ui search dropdown">
+                            {% for branch in branches %}
+                                <option value="{{ branch }}" {% if object.default_branch == branch %}selected=""{% endif %}>{{ branch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="eight wide field">
+                        <label for="badge_input">Badge Markdown</label>
+                        <div class="ui action input">
+                            <input id="badge_input" type="text" readonly value="[![Linty]({{ badge_url }})]({{ absolute_url }})">
+                            <div class="ui blue icon button copy_button right labeled" data-clipboard-target="#badge_input" data-inverted="">
+                                <i class="copy icon"></i>
+                                Copy
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    Copy the markdown above and place it in your repo's <b>README.md</b> file to get a badge showing the status of the latest commit to your default branch.
+                    The badge will link to your repo on Linty. Here is this repo's badge:
+                </p>
+                <img class="ui image centered" src="{{ badge_url }}" alt="badge">
+                <h4 class="ui horizontal divider header">
+                  Status Checks
+                </h4>
+                <div class="field">
+                    <div class="ui toggle checkbox">
+                        <input name="statuses" id="statuses" type="checkbox" {% if object.webhook_id %}checked=""{% endif %} />
+                        <label for="statuses">Enable Status Checks on GitHub</label>
+                    </div>
+                </div>
+                <p>
+                    Status Checks show in pull requests and next to commits on GitHub and say if a commit passed or failed linting.<br/>
+                    You can enforce style code adherence by making Linty a <a target="_blank" href="https://help.github.com/articles/enabling-required-status-checks/">required status check</a>.
+                    Here is what it looks like:
+                </p>
+                <img src="{% static 'img/status.png' %}" alt="status" class="ui image centered">
+                <h4 class="ui horizontal divider header">
+                  Permissions
+                </h4>
+                <p>
+                    Linty respects the same permissions as GitHub. If your repo is public, then this repo's builds are public.
+                    However, only collaborators may access these settings.
+                    If your repo is private, only collaborators of the repository can see the builds.<br/>
+                    Linty staff may see all pages, for support purposes.
+                </p>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui left aligned red button" id="stop_linting">
+                Stop Linting
+            </div>
+            <div class="ui gray cancel button">
+                <i class="remove icon"></i>
+                Cancel
+            </div>
+            <div id="save_button" class="ui green ok button">
+                <i class="checkmark icon"></i>
+                Save
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
-    <script type="text/javascript">
-        $.fn.api.settings.api = {
-            'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
-        };
-    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}

@@ -45,10 +45,13 @@ class BuildDetailView(generic.DetailView):
         return self.render_to_response(context)
 
 
-class RepoDetailView(generic.DetailView):
+class RepoDetailView(generic.DetailView, generic.UpdateView):
     model = Repo
     slug_field = 'full_name'
     slug_url_kwarg = 'full_name'
+    template_name = 'interface/repo_detail.html'
+
+    fields = ['default_branch']
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -60,9 +63,13 @@ class RepoDetailView(generic.DetailView):
         if self.object.is_private and not is_collab:
             raise Http404('You are not allowed to view this Repo')
 
-        url = reverse('badge', kwargs={'full_name': self.object.full_name})
-        context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
-        context['badge_url'] = self.request.build_absolute_uri(url)
+        if is_collab:
+            url = reverse('badge', kwargs={'full_name': self.object.full_name})
+            context['absolute_url'] = self.request.build_absolute_uri(self.request.path)
+            context['badge_url'] = self.request.build_absolute_uri(url)
+            g = get_github(self.object.user)
+            grepo = g.get_repo(self.object.full_name)
+            context['branches'] = [i.name for i in grepo.get_branches()]
 
         ref = request.GET.get('ref', False)
         context['ref'] = ref
@@ -87,6 +94,21 @@ class RepoDetailView(generic.DetailView):
 
         return self.render_to_response(context)
 
+    def form_valid(self, form):
+        self.object = self.get_object()
+        redirect = super(RepoDetailView, self).form_valid(form)
+        statuses = self.request.POST.get('statuses', False)
+        if statuses == 'on' and not self.object.webhook_id:
+            self.object.add_webhook(self.request)
+        elif not statuses and self.object.webhook_id:
+            self.object.remove_webhook()
+        return redirect
+
+    def form_invalid(self, form):
+        # TODO: Submit form via ajax, show error message if invalid
+        # I have no idea how someone would submit an invalid form
+        return render(self.request, 'interface/500.html')
+
 
 class RepoListView(LoginRequiredMixin, generic.ListView):
     template_name = 'interface/repo_list.html'
@@ -101,7 +123,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
 
         self.object_list = Repo.objects.filter(
             full_name__in=[i.full_name for i in repos],
-            webhook_id__isnull=False
+            disabled=False
         ).annotate(builds_count=Count('builds'))
 
         names = [x.full_name for x in self.object_list]
@@ -157,6 +179,9 @@ def ProcessRepo(request, full_name):
 
     try:
         repo = Repo.objects.get(full_name=grepo.full_name)
+        repo.disabled = False
+        repo.is_private = grepo.private
+        repo.save()
     except Repo.DoesNotExist:
         repo = None
 
@@ -165,7 +190,7 @@ def ProcessRepo(request, full_name):
             raise Http404('You are not a collaborator of this repo')
     else:
         if not repo:
-            repo = Repo.objects.create(full_name=grepo.full_name, user=user)
+            repo = Repo.objects.create(full_name=grepo.full_name, user=user, default_branch=grepo.default_branch)
 
         if not repo.webhook_id:
             try:

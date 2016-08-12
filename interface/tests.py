@@ -74,14 +74,20 @@ class RepoDetailTests(LintTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_repo_list_auth_200(self):
+    @mock.patch('github.Repository.Repository.get_branches')
+    def test_repo_list_auth_200(self, mock_branches):
+        mock_branches.return_value = [type('test', (), {'name': 'master'})]
+
         self.client.force_login(self.user, backend=settings.AUTHENTICATION_BACKENDS[0])
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.repo.full_name)
         self.assertContains(response, self.build.id)
 
-    def test_build_results_paginated(self):
+    @mock.patch('github.Repository.Repository.get_branches')
+    def test_build_results_paginated(self, mock_branches):
+        mock_branches.return_value = [type('test', (), {'name': 'master'})]
+
         for _ in range(49):
             Build.objects.create(
                 repo=self.repo,
@@ -108,7 +114,7 @@ class RepoDeleteTests(LintTestCase):
 
     def test_repo_delete_unauth_404(self):
         response = self.client.get(self.url)
-        self.assertIsNotNone(self.repo.webhook_id)
+        self.assertIsNotNone(self.repo.disabled)
         self.assertEqual(response.status_code, 404)
 
     # Disabled because requires OAuth
