@@ -152,13 +152,31 @@
                         </div>
                     </div>
                 </div>
+                <p>
+                    You may copy the markdown above and place it in your repo's README.md file to get a badge showing the pass/fail status of your default branch.
+                    The badge will link to this page.
+                </p>
+                <div class="ui divider"></div>
                 <div class="field">
                     <div class="ui toggle checkbox">
                         <input name="statuses" id="statuses" type="checkbox" {% if object.webhook_id %}checked=""{% endif %} />
-                        <label for="statuses">Publish Commit Statuses on GitHub</label>
+                        <label for="statuses">Status Checks on GitHub</label>
                     </div>
                 </div>
+                <p>
+                    Enable Status Checks to get Linty status checks in your Pull Requests and commits.
+                    You can enforce style code adherence by making Linty a <a href="https://help.github.com/articles/enabling-required-status-checks/">required status check</a>.
+                </p>
             </form>
+            <h4 class="ui horizontal divider header">
+              Permissions
+            </h4>
+            <p>
+                Linty respects the same permissions as GitHub. If your repo is public, then this page and all builds are public.
+                However, only collaborators may access these settings.
+                If your repo is private, only collaborators of the repository can see this page or any builds.
+                Linty staff may see all pages, for support purposes.
+            </p>
         </div>
         <div class="actions">
             <div class="ui left aligned red button" id="stop_linting">
