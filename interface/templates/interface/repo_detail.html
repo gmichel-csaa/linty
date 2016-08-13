@@ -78,7 +78,7 @@
             </thead>
             <tbody>
             {% for build in builds %}
-                <tr>
+                <tr class="build_row">
                     <td>
                         <div class="ui text {% if build.status == 'success' %}green{% elif build.status == 'pending' %}yellow{% else %}red{% endif %}">
                             <i class="large icon {% if build.status == 'success' %}check{% elif build.status == 'pending' %}warning triangle{% else %}warning circle{% endif %}"></i>
@@ -86,10 +86,13 @@
                         </div>
                     </td>
                     <td>
-                        <a href="{% url 'build_detail' pk=build.pk %}">{{ build.short_sha }}</a>
+                        <a class="build_link" href="{% url 'build_detail' pk=build.pk %}">{{ build.short_sha }}</a>
                     </td>
                     <td>
-                        <a href="{% url 'repo_detail' full_name=object.full_name %}?ref={{ build.ref }}">{{ build.ref }}</a>
+                        <a class="ui label" href="{% url 'repo_detail' full_name=object.full_name %}?ref={{ build.ref }}">
+                            <i class="icon filter"></i>
+                            {{ build.ref }}
+                        </a>
                     </td>
                     <td>{{ build.created_at|naturaltime }}</td>
                 </tr>
@@ -201,5 +204,10 @@
 
 {% block extra_js %}
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script type="text/javascript">
+     $.fn.api.settings.api = {
+        'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
+    };
+    </script>
     <script type="text/javascript" src="{% static 'js/repo_detail.js' %}"></script>
 {% endblock %}

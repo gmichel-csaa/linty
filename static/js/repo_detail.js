@@ -61,9 +61,6 @@ $('#stop_linting').on('click', function (e) {
   }).modal('show');
 });
 
- $.fn.api.settings.api = {
-    'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
-};
 $('select.dropdown').dropdown();
 $('#settings_modal').modal({
   'autofocus': false,
@@ -75,4 +72,7 @@ $('#settings_modal').modal({
 });
 $('#settings').on('click', function(){
    $('#settings_modal').modal('show');
+});
+$('.build_row').on('click', function(){
+  window.location = this.querySelector('.build_link').href;
 });
