@@ -61,9 +61,6 @@ $('#stop_linting').on('click', function (e) {
   }).modal('show');
 });
 
- $.fn.api.settings.api = {
-    'stop_linting': '{% url "repo_delete" full_name=object.full_name %}'
-};
 $('select.dropdown').dropdown();
 $('#settings_modal').modal({
   'autofocus': false,
