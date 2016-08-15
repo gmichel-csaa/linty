@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% load staticfiles %}
+{% load tz %}
 
 {% block title %}Linty - {{ object.full_name }}{% endblock %}
 
@@ -88,7 +89,9 @@
                             {{ build.ref }}
                         </a>
                     </td>
-                    <td>{{ build.created_at|naturaltime }}</td>
+                    <td data-tooltip="{{ build.created_at }} {% get_current_timezone as TIME_ZONE %}{{ TIME_ZONE }}" data-position="top left" data-inverted="">
+                        {{ build.created_at|naturaltime }}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
