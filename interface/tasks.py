@@ -1,7 +1,8 @@
-from interface.models import Build
+from django.apps import apps
 
 
 def build_handler(build_id):
+    Build = apps.get_model('interface.Build')
     try:
         build = Build.objects.get(id=build_id)
     except Build.DoesNotExist:
