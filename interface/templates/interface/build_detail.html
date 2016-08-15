@@ -22,7 +22,7 @@
             </div>
         </div>
         {% if user.is_authenticated %}
-            <div class="ui right dropdown item">
+            <div id="user_dropdown" class="ui right dropdown item">
                 {{ user.username }}
                 <i class="dropdown icon"></i>
                 <div class="menu">
