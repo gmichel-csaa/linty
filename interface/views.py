@@ -177,26 +177,37 @@ def ProcessRepo(request, full_name):
     guser = g.get_user(user.username)
     is_collab = grepo.has_in_collaborators(guser)
 
+    if not is_collab and grepo.private:
+        raise Http404('You are not a collaborator of this repo')
+
     try:
         repo = Repo.objects.get(full_name=grepo.full_name)
         repo.disabled = False
         repo.is_private = grepo.private
         repo.save()
     except Repo.DoesNotExist:
-        repo = None
+        repo = Repo.objects.create(
+            full_name=grepo.full_name,
+            user=user,
+            default_branch=grepo.default_branch
+        )
 
-    if not is_collab:
-        if grepo.private or not repo:
-            raise Http404('You are not a collaborator of this repo')
-    else:
-        if not repo:
-            repo = Repo.objects.create(full_name=grepo.full_name, user=user, default_branch=grepo.default_branch)
+    if not repo.webhook_id:
+        try:
+            repo.add_webhook(request)
+        except UnknownObjectException:
+            raise Http404('Github failed to create a hook')
 
-        if not repo.webhook_id:
-            try:
-                repo.add_webhook(request)
-            except UnknownObjectException:
-                raise Http404('Github failed to create a hook')
+    # Lint all open branches
+    auth = request.user.get_auth()
+
+    for branch in grepo.get_branches():
+        build = Build.objects.create(
+            repo=repo,
+            ref=branch.name,
+            sha=branch.commit.sha
+        )
+        build.enqueue(auth)
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
@@ -208,8 +219,6 @@ def Rebuild(request, pk):
         build = Build.objects.get(id=pk)
     except Build.DoesNotExist:
         raise Http404('Build does not exist')
-
-    build.set_status(auth, Build.PENDING)
 
     if not request.user.is_staff:
         g = get_github(request.user)
@@ -226,7 +235,8 @@ def Rebuild(request, pk):
 
     Result.objects.filter(build=build).delete()
 
-    django_rq.enqueue(build_handler, build.id)
+    auth = request.user.get_auth()
+    build.enqueue(auth)
 
     return redirect(reverse('build_detail', kwargs={'pk': build.id}))
 
@@ -274,8 +284,7 @@ def WebhookView(request):
             sha=sha
         )
 
-    build.set_status(auth, Build.PENDING)
-    django_rq.enqueue(build_handler, build.id)
+    build.enqueue(auth)
 
     return HttpResponse(status=202)
 

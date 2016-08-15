@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 
+import django_rq
 import requests
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from interface import linters
 from interface.linters import LINTER_CHOICES
+from interface.tasks import build_handler
 from interface.utils import get_github
 
 
@@ -194,6 +196,10 @@ class Build(models.Model):
 
     def lint(self):
         return linters.lint(self)
+
+    def enqueue(self, auth):
+        self.set_status(auth, Build.PENDING)
+        django_rq.enqueue(build_handler, self.id)
 
     def get_issues(self):
         g = get_github(self.repo.user)
