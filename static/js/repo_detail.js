@@ -32,33 +32,19 @@ copyButton.on('error', function (e) {
 
 // Stop linting button
 
-$('#stop_linting').on('click', function (e) {
-  var elem = e.target;
-  $('#stop_linting').addClass('loading');
-  $('#stop_linting_modal').modal({
-    onDeny: function () {
-      $('#stop_linting').removeClass('loading');
+$('#stop_linting').api({
+    action: 'stop_linting',
+    on: 'click',
+    method: 'DELETE',
+    onSuccess: function() {
+      // redirect user
+      window.location = '/repos';
     },
-    onApprove: function () {
-      $('#confirm_button').addClass('loading');
-      $('#stop_linting').api({
-          action: 'stop_linting',
-          on: 'now',
-          method: 'DELETE',
-          onSuccess: function() {
-            // redirect user
-            window.location = '/repos';
-          },
-          onFailure: function() {
-            // Tell user it failed
-            window.alert('An error occured while attempting to delete this repo.');
-            $('#confirm_button').removeClass('loading');
-            $('#stop_linting').removeClass('loading');
-          }
-      });
-      return false;
+    onFailure: function() {
+      // Tell user it failed
+      window.alert('An error occured while attempting to delete this repo.');
+      $('#stop_linting').removeClass('loading');
     }
-  }).modal('show');
 });
 
 $('#default_branch').dropdown();

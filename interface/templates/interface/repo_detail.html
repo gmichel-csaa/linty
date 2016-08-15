@@ -102,29 +102,6 @@
 
     {% include 'interface/repo_pagination.html' %}
 
-    <div id="stop_linting_modal" class="ui small basic modal">
-        <div class="ui icon header">
-            <i class="archive icon"></i>
-            Stop Linting
-        </div>
-        <div class="content">
-            <p>
-                Are you sure you want to stop linting "<b>{{ object.full_name }}</b>"?
-                All previous builds will be preserved, but future builds will cease.
-            </p>
-        </div>
-        <div class="actions">
-            <div class="ui red basic cancel inverted button">
-                <i class="remove icon"></i>
-                No
-            </div>
-            <div id="confirm_button" class="ui green ok inverted button">
-                <i class="checkmark icon"></i>
-                Yes
-            </div>
-        </div>
-    </div>
-
     <div id="settings_modal" class="ui small modal">
         <div class="header">
             Repository Settings
