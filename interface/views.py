@@ -202,12 +202,13 @@ def ProcessRepo(request, full_name):
     auth = request.user.get_auth()
 
     for branch in grepo.get_branches():
-        build = Build.objects.create(
+        build, created = Build.objects.get_or_create(
             repo=repo,
             ref=branch.name,
             sha=branch.commit.sha
         )
-        build.enqueue(auth)
+        if created:
+            build.enqueue(auth)
 
     url = reverse('repo_detail', kwargs={'full_name': repo.full_name})
     return redirect(url)
