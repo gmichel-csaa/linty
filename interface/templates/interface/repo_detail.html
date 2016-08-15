@@ -16,7 +16,7 @@
             </div>
         </div>
         {% if user.is_authenticated %}
-            <div class="ui right dropdown item">
+            <div id="user_dropdown" class="ui right dropdown item">
                 {{ user.username }}
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -40,32 +40,26 @@
         {% endif %}
     </div>
 
-    {% if is_owner %}
-        <div class="ui text menu">
-            <div class="ui item">
-            <h2>
-                {% if ref %}
-                    ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
-                {% else %}
-                    All Builds
+    <div class="ui text menu">
+        <div class="ui item">
+            <select name="filter_select" id="filter_select" class=" ui search dropdown small">
+                <option value="*" {% if not ref %}selected="selected"{% endif %}>All branches</option>
+                {% for branch in branches %}
+                <option value="{{ branch }}" {% if ref == branch %}selected=""{% endif %}>{{ branch }}</option>
+                {% endfor %}
+                {% if ref and ref not in branches %}
+                <option value="{{ ref }}" selected="">{{ ref }}</option>
                 {% endif %}
-            </h2>
-            </div>
-            <div class="ui right item">
-                <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
-                    <i class="icon setting"></i>
-                </button>
-            </div>
+            </select>
         </div>
-    {% else %}
-    <h2 class="ui header">
-        {% if ref %}
-            ref: {{ ref }} (<a href="{% url 'repo_detail' full_name=object.full_name %}">View All</a>)
-        {% else %}
-            All Builds
+        {% if is_owner %}
+        <div class="ui right item">
+            <button id="settings" class="ui icon right aligned big basic button" data-inverted="" data-position="bottom right" data-tooltip="Settings">
+                <i class="icon setting"></i>
+            </button>
+        </div>
         {% endif %}
-    </h2>
-    {% endif %}
+    </div>
     {% if builds %}
         <table class="ui very basic selectable table">
             <thead>

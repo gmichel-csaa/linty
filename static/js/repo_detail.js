@@ -61,7 +61,7 @@ $('#stop_linting').on('click', function (e) {
   }).modal('show');
 });
 
-$('select.dropdown').dropdown();
+$('#default_branch').dropdown();
 $('#settings_modal').modal({
   'autofocus': false,
   'onApprove': function() {
@@ -76,3 +76,11 @@ $('#settings').on('click', function(){
 $('.build_row').on('click', function(){
   window.location = this.querySelector('.build_link').href;
 });
+$('#filter_select').dropdown({'action': function(text, value){
+  var root = window.location.origin + window.location.pathname;
+  if (value === '*') {
+    window.location = root;
+  } else {
+    window.location = root + '?ref=' + value;
+  }
+}});
