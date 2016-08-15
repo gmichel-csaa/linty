@@ -4,6 +4,12 @@
 
 {% block title %}Linty - {{ object.short_sha }}{% endblock %}
 
+{% block extra_head %}
+{% if object.status == 'pending' %}
+<meta http-equiv="refresh" content="10" >
+{% endif %}
+{% endblock %}
+
 {% block body %}
     <div class="ui text menu">
         <div class="ui item">
