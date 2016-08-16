@@ -91,7 +91,7 @@
                 <div class="content {{ output|yesno:"active," }}">
                     <div class="ui form transition {{ output|yesno:",hidden" }}">
                         <div class="field">
-                            <textarea class="output" readonly>{{ output|default_if_none:"" }}</textarea>
+                            <textarea class="output" readonly style="max-height: 800px;">{{ output|default_if_none:"" }}</textarea>
                         </div>
                     </div>
                 </div>
