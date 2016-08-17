@@ -309,9 +309,9 @@ class BadgeView(generic.DetailView):
 class TimelineView(StaffRequiredMixin, generic.ListView):
     def get_queryset(self):
         builds = Build.objects \
-             .select_related('repo') \
-             .order_by('-created_at') \
-             .values('id', 'repo__full_name', 'created_at', 'finished_at')[:500]
+            .select_related('repo') \
+            .order_by('-created_at') \
+            .values('id', 'repo__full_name', 'created_at', 'finished_at')[:500]
         repos = Repo.objects \
             .order_by('-created_at') \
             .values('id', 'full_name', 'created_at')[:500]

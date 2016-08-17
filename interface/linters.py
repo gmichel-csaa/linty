@@ -46,8 +46,8 @@ def pycodestyle(build, cwd):
 
 
 def npm_lint(build, cwd):
-    my_env = os.environ.copy()
-    my_env["PATH"] = "/usr/local/bin:" + my_env["PATH"]
+    path = "/usr/local/bin:" + os.environ['PATH']
+    my_env = {'path': path}
 
     try:
         # TODO: only install whatever the linter needs
