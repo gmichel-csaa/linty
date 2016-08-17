@@ -32,7 +32,7 @@ def lint(build):
 def pycodestyle(build, cwd):
     # TODO: Allow the user to specify their preferred version of pycodestyle
     try:
-        output = subprocess.check_output(['pycodestyle', cwd])
+        output = subprocess.check_output(['pycodestyle', cwd, '--ignore=E305'])
         passing = True
     except subprocess.CalledProcessError as e:
         output = e.output
