@@ -6,11 +6,10 @@
 [Linty](https://www.lintyapp.com) is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
 
 Features:
-* One click repo registration/de-registration
+* One click repo registration
 * Pass/Fail statuses on Pull Requests
 * History of lint results
 * Pass/Fail Badges for your READMEs
-* Proper permissions for private repos
 
 The app is live at [lintyapp.com](https://www.lintyapp.com). Linty is still under heavy development, and is likely to change often and significantly. Things might break. Use with discretion.
 
@@ -65,3 +64,9 @@ You now have the server running!
 
 Issues and Pull Requests are welcome.
 You can view the development progress on Trello [here](https://trello.com/b/w6mQAxUG/linty)
+
+
+### License
+
+Linty is Copyright © 2016 ZeroCater. It is free software, and may be
+redistributed under the terms specified in the [LICENSE](LICENSE) file.
