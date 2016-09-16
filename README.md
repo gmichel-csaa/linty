@@ -27,7 +27,7 @@ Here's an example `package.json` for eslint:
 {
   ...
   "scripts": {
-    "lint:": "eslint .",
+    "lint": "eslint .",
     ...
   },
   "devDependencies": {
