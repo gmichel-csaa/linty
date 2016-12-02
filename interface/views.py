@@ -187,7 +187,8 @@ def ProcessRepo(request, full_name):
         repo = Repo.objects.create(
             full_name=grepo.full_name,
             user=user,
-            default_branch=grepo.default_branch
+            default_branch=grepo.default_branch,
+            is_private=grepo.private
         )
 
     if not repo.webhook_id:
