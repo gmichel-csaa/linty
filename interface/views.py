@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import json
 
-import django_rq
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -21,7 +20,6 @@ from social.apps.django_app.views import auth
 
 from interface.mixins import StaffRequiredMixin
 from interface.models import Build, Repo, Result, UserProxy
-from interface.tasks import build_handler
 from interface.utils import get_github, get_page_number_list
 
 
@@ -37,7 +35,7 @@ class BuildDetailView(generic.DetailView):
         issues = self.object.get_issues()
         context['issues'] = issues if issues.totalCount > 0 else False
 
-        if context['repo'].is_private and not is_collab:
+        if self.object.repo.is_private and not is_collab:
             raise Http404('You are not allowed to view this Build')
 
         context['results'] = self.object.results.all()
@@ -189,7 +187,8 @@ def ProcessRepo(request, full_name):
         repo = Repo.objects.create(
             full_name=grepo.full_name,
             user=user,
-            default_branch=grepo.default_branch
+            default_branch=grepo.default_branch,
+            is_private=grepo.private
         )
 
     if not repo.webhook_id:
