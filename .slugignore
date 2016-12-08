@@ -1,0 +1,8 @@
+.env.sample
+.gitignore
+circle.yml
+LICENSE
+README.md
+requirements.dev.txt
+# Don't apply linty's rules to other projects
+setup.cfg
