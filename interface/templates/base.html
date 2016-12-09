@@ -3,9 +3,9 @@
 <head>
     <title>{% if DEBUG %}[DEBUG] {% endif %}{% block title %}{% endblock %}</title>
     <meta charset="UTF-8">
-    <meta name="description" content="Free automated code linting">
     <meta name="keywords" content="code,lint,linty,pep8,pycodestyle,eslint,ci">
-    <meta name="author" content="https://github.com/birkholz">
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="Linty"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     {% block extra_head %}{% endblock %}

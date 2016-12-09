@@ -5,6 +5,11 @@
 
 {% block title %}Linty - {{ object.full_name }}{% endblock %}
 
+{% block extra_head %}
+    <meta property="og:title" content="Linty - {{ object.full_name }}">
+    <meta property="og:description" content="Linting results for {{ object.full_name }}.">
+{% endblock %}
+
 {% block body %}
     <div class="ui text menu">
         <div class="ui item">
