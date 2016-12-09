@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.templatetags.static import static
 from django.utils import timezone
 from github import UnknownObjectException
 from social.apps.django_app.default.models import UserSocialAuth
@@ -138,6 +139,27 @@ class Build(models.Model):
             full_name=self.repo.full_name,
             sha=self.sha
         )
+
+    @property
+    def meta_description(self):
+        desc = '{0} '.format(self.short_sha)
+        if self.status == 'success':
+            desc += 'passed linting!'
+        elif self.status == 'pending':
+            desc += 'is still being linted.'
+        else:
+            desc += 'failed linting. See failures here.'
+        return desc
+
+    @property
+    def meta_image(self):
+        if self.status == 'success':
+            url = static('img/pass.png')
+        elif self.status == 'pending':
+            url = static('img/pending')
+        else:
+            url = static('img/fail.png')
+        return url
 
     def publish_status(self, auth, state, description):
         hostname = settings.HOSTNAME

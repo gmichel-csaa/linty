@@ -9,8 +9,8 @@
     <meta http-equiv="refresh" content="10" >
     {% endif %}
     <meta property="og:title" content="Linty - {{ repo.full_name }}:{{ object.short_sha }}">
-    <meta property="og:description" content="{{ repo.full_name }}:{{ object.short_sha }} {% if object.status == 'success' %}passed linting!{% elif object.status == 'pending' %}is still being linted.{% else %}failed linting.{% endif %}">
-    <meta property="og:image" content="{% if object.status == 'success' %}{% static 'img/pass.png' %}{% elif object.status == 'pending' %}{% static 'img/pending.png' %}{% else %}{% static 'img/fail.png' %}{% endif %}">
+    <meta property="og:description" content="{{ object.meta_description }}">
+    <meta property="og:image" content="{{ object.meta_image }}">
     <meta property="og:image:width" content="128">
     <meta property="og:image:height" content="128">
 {% endblock %}
