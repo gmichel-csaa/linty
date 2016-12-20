@@ -1,3 +1,20 @@
 {
-
+  "name": "linty",
+  "version": "1.0.0",
+  "description": "javascript linters for linty",
+  "engines": {
+    "node": "6.6.0"
+  },
+  "dependencies": {
+    "eslint": "^3.7.1",
+    "eslint-config-airbnb": "^11.1.0",
+    "eslint-config-littlebits": "^0.5.1",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-config-semistandard": "^7.0.0",
+    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-promise": "^3.3.0",
+    "eslint-plugin-react": "^6.2.2",
+    "eslint-plugin-standard": "^2.0.0"
+  }
 }

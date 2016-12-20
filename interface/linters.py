@@ -2,14 +2,14 @@ import os
 import subprocess
 
 from django.apps import apps
-
+from django.conf import settings
 
 PYCODESTYLE = 'pycodestyle'
-NPM_LINT = 'npm_lint'
+ESLINT = 'eslint'
 
 LINTER_CHOICES = (
     (PYCODESTYLE, PYCODESTYLE),
-    (NPM_LINT, 'NPM Lint')
+    (ESLINT, ESLINT)
 )
 
 
@@ -24,7 +24,7 @@ def lint(build):
     if os.path.isfile(os.path.join(cwd, 'requirements.txt')):
         passing = run_linter(pycodestyle, cwd)
     elif os.path.isfile(os.path.join(cwd, 'package.json')):
-        passing = run_linter(npm_lint, cwd)
+        passing = run_linter(eslint, cwd)
 
     return passing
 
@@ -45,14 +45,19 @@ def pycodestyle(build, cwd):
     return passing
 
 
-def npm_lint(build, cwd):
-    path = "/usr/local/bin:" + os.environ['PATH']
-    my_env = {'PATH': path}
-
+def eslint(build, cwd):
     try:
-        # TODO: only install whatever the linter needs
-        subprocess.call('npm install --ignore-scripts --only=dev', cwd=cwd, shell=True, env=my_env)
-        output = subprocess.check_output('npm run lint', cwd=cwd, shell=True, env=my_env)
+        path = "/usr/local/bin:" + os.environ['PATH']
+        my_env = {'PATH': path}
+        binary = os.path.join(settings.BASE_DIR, 'node_modules/eslint/bin/eslint.js')
+        output = subprocess.run(
+            [binary, cwd],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            env=my_env,
+            universal_newlines=True
+        ).output
         passing = True
     except subprocess.CalledProcessError as e:
         output = e.output
@@ -60,10 +65,8 @@ def npm_lint(build, cwd):
 
     if output:
         # Strip directory
-        output = output.decode("utf-8").replace(cwd, '')
-        # Remove junk npm call lines
-        output = output.split('\n', 1)[1]
+        output = output.replace(cwd, '')
         Result = apps.get_model('interface', 'Result')
-        Result.objects.create(build=build, linter=NPM_LINT, output=output)
+        Result.objects.create(build=build, linter=ESLINT, output=output)
 
     return passing

@@ -29,6 +29,9 @@ body > .ui.text.container {
 textarea.output {
     font-family: monospace;
     font-size: 12px !important;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
 }
 .left.aligned.button {
     float: left;
