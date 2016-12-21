@@ -269,6 +269,11 @@ def WebhookView(request):
     except Repo.DoesNotExist:
         return 'Repo not registered'
 
+    # Update repo privacy, if changed
+    if repo.is_private != body['repository']['private']:
+        repo.is_private = body['repository']['private']
+        repo.save()
+
     auth = repo.user.get_auth()
     if not auth:
         return 'User for repo not logged in'
