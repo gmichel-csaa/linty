@@ -1,9 +1,9 @@
-# [Linty](https://www.lintyapp.com)
+# [Linty](https://lintyapp.com)
 [![CircleCI](https://circleci.com/gh/ZeroCater/linty.svg?style=svg)](https://circleci.com/gh/ZeroCater/linty)
 [![Coverage Status](https://coveralls.io/repos/github/ZeroCater/linty/badge.svg?branch=master)](https://coveralls.io/github/ZeroCater/linty?branch=master)
-[![Linty](https://www.lintyapp.com/repo/ZeroCater/linty/badge.svg)](https://www.lintyapp.com/repo/ZeroCater/linty)
+[![Linty](https://lintyapp.com/repo/ZeroCater/linty/badge.svg)](https://lintyapp.com/repo/ZeroCater/linty)
 
-[Linty](https://www.lintyapp.com) is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
+[Linty](https://lintyapp.com) is _Linting as a Service_. Users can sign in with Github, select a repo, and immediately get linting for their code.
 
 Features:
 * One click repo registration
@@ -11,7 +11,7 @@ Features:
 * History of lint results
 * Pass/Fail Badges for your READMEs
 
-The app is live at [lintyapp.com](https://www.lintyapp.com). Linty is still under heavy development, and is likely to change often and significantly. Things might break. Use with discretion.
+The app is live at [lintyapp.com](https://lintyapp.com). Linty is still under heavy development, and is likely to change often and significantly. Things might break. Use with discretion.
 
 ### Setup
 
