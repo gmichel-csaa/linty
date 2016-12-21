@@ -1,5 +1,4 @@
 -r requirements.txt
 
 ipython>=4.2.0
-django-dotenv==1.4.1
 mock==2.0.0
