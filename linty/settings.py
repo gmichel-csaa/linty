@@ -26,8 +26,7 @@ INSTALLED_APPS = [
     'social.apps.django_app.default',
     'django.contrib.humanize',
     'interface',
-    'django_rq',
-    'raven.contrib.django.raven_compat'
+    'django_rq'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -147,6 +146,10 @@ if DEBUG:
 
 # Production
 if not DEBUG:  # pragma: no cover
+    INSTALLED_APPS += [
+        'raven.contrib.django.raven_compat'
+    ]
+
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
