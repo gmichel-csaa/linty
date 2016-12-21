@@ -135,6 +135,8 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
 
+APPEND_SLASH = False
+
 RQ_QUEUES = {
     'default': {
         'URL': os.environ.get('REDIS_URL', 'redis://localhost:6379/0'),
