@@ -39,8 +39,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'interface.middleware.UserProxyMiddleware',
-    'interface.middleware.SubdomainMiddleware'
+    'interface.middleware.UserProxyMiddleware'
 ]
 
 ROOT_URLCONF = 'linty.urls'
@@ -134,9 +133,6 @@ LOGIN_REDIRECT_URL = '/repos'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = LOGIN_REDIRECT_URL
 
 WEBHOOK_SECRET = os.environ.get('WEBHOOK_SECRET', '')
-
-APPEND_SLASH = False
-TRAILING_SLASH = False
 
 RQ_QUEUES = {
     'default': {
