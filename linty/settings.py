@@ -26,7 +26,8 @@ INSTALLED_APPS = [
     'social.apps.django_app.default',
     'django.contrib.humanize',
     'interface',
-    'django_rq'
+    'django_rq',
+    'raven.contrib.django.raven_compat'
 ]
 
 MIDDLEWARE_CLASSES = [
