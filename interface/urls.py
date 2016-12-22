@@ -19,5 +19,4 @@ urlpatterns = [
     url(r'^webhook$', views.WebhookView, name='webhook'),
     url(r'^timeline$', views.TimelineView.as_view(), name='timeline'),
     url(r'^logout', views.LogoutView, name='logout'),
-    url(r'^login', views.LoginView, name='login')
 ]

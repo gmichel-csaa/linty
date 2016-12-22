@@ -6,32 +6,16 @@
 
 {% block body %}
     <div class="ui text menu">
-        {% if user.is_authenticated %}
-            <div class="ui item">
-                <div class="ui large breadcrumb">
-                    <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
-                    <i class="right chevron icon divider"></i>
-                    <div class="active section">Error</div>
-                </div>
+        <div class="ui item">
+            <div class="ui large breadcrumb">
+                {% if user.is_authenticated %}
+                <a href="{% url 'repo_list' %}" class="section">Dashboard</a>
+                <i class="right chevron icon divider"></i>
+                {% endif %}
+                <div class="active section">Page Not Found</div>
             </div>
-            <div id="user_dropdown" class="ui right dropdown item">
-                {{ user.username }}
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a href="{% url 'logout' %}" class="item">Log Out</a>
-                </div>
-            </div>
-        {% else %}
-            {% if DEBUG %}
-                <div class="ui right item">
-                <a href="{% url 'admin:login' %}" class="ui blue basic button">Log in</a>
-            </div>
-            {% else %}
-                <div class="ui right item">
-                <a href="{% url 'login' %}" class="ui blue basic button">Log in</a>
-            </div>
-            {% endif %}
-        {% endif %}
+        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
     </div>
     <div class="ui container center aligned">
         <h1 class="ui header">Page Not Found</h1>
@@ -39,7 +23,7 @@
             The page you tried to reach does not exist.
         </p>
         <p class="description">
-            Perhaps try logging in <a href="{% url 'login' %}">here</a>.
+            Perhaps try logging in <a href="{% url 'social:begin' 'github' %}">here</a>.
         </p>
         {% if user.is_authenticated %}
             <a href="{% url 'repo_list' %}" class="ui big primary button">Go to Dashboard</a>

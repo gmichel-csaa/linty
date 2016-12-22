@@ -7,16 +7,7 @@
         <div class="ui item">
             <h1 class="ui header">Dashboard</h1>
         </div>
-        <div id="user_dropdown" class="ui right dropdown item">
-            {{ user.username }}
-            <i class="dropdown icon"></i>
-            <div class="menu">
-                {% if user.is_staff %}
-                    <a class="item" href="{% url 'timeline' %}">Timeline</a>
-                {% endif %}
-                <a href="{% url 'logout' %}?next=/" class="item">Log Out</a>
-            </div>
-        </div>
+        {% include 'interface/user_dropdown.html' with private=True %}
     </div>
     <div class="ui warning tiny message">
         <div class="header">
