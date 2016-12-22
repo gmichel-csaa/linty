@@ -117,7 +117,7 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
             repos = [r for r in g.get_user().get_repos()]
         except BadCredentialsException:
             UserSocialAuth.objects.filter(user=request.user).delete()
-            return redirect(reverse('login'))
+            return redirect(reverse('social:begin', args=['github'])) + '?next=' + request.path
 
         self.object_list = Repo.objects.filter(
             full_name__in=[i.full_name for i in repos],
@@ -133,6 +133,8 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
 
         context = self.get_context_data()
         context['repos'] = filtered
+
+        context['welcome'] = request.GET.get('welcome', False)
 
         return self.render_to_response(context)
 
@@ -348,10 +350,6 @@ class TimelineView(StaffRequiredMixin, generic.ListView):
         return context
 
     template_name = 'interface/timeline.html'
-
-
-def LoginView(request):
-    return auth(request, 'github')
 
 
 def LogoutView(request):

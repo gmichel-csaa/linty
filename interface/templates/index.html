@@ -31,7 +31,7 @@
                     {% elif DEBUG %}
                         <a href="{% url 'admin:login' %}" class="ui inverted button">Log in</a>
                     {% else %}
-                        <a href="{% url 'login' %}" class="ui inverted button">Log in</a>
+                        <a href="{% url 'social:begin' 'github' %}?next={{ request.path }}" class="ui inverted button">Log in</a>
                     {% endif %}
                 </div>
             </div>
@@ -40,7 +40,7 @@
             <h1 class="ui inverted header">Linty</h1>
             <h2>Linting as a Service</h2>
             <br>
-            <a class="ui huge violet button" href="{% url 'login' %}">
+            <a class="ui huge violet button" href="{% url 'social:begin' 'github' %}">
                 <i class="icon github"></i>
                 Sign Up With Github
             </a>
@@ -65,7 +65,7 @@
             </div>
             <div class="row">
                 <div class="center aligned column">
-                    <a class="ui huge primary button" href="/login/github">
+                    <a class="ui huge primary button" href="{% url 'social:begin' 'github' %}">
                         Connect with Github
                         <i class="big icon github"></i>
                     </a>
