@@ -16,6 +16,12 @@
         Linty is fairly new, and still under heavy development. Things are likely to break or change significantly. Please use with discretion.
         You can follow development on <a href="https://trello.com/b/w6mQAxUG/linty">Trello</a> or <a href="https://github.com/ZeroCater/linty">GitHub</a>.
     </div>
+    {% if welcome %}
+    <div class="ui success tiny message">
+        <div class="header">Welcome!</div>
+        Welcome to Linty! Below is a list of all the repositories you are a collaborator of. Click on one to start linting!
+    </div>
+    {% endif %}
     <h2 class="ui header">Registered Repos</h2>
     <div class="ui large middle aligned divided relaxed selection list">
         {% for obj in object_list %}

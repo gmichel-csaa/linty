@@ -134,6 +134,8 @@ class RepoListView(LoginRequiredMixin, generic.ListView):
         context = self.get_context_data()
         context['repos'] = filtered
 
+        context['welcome'] = request.GET.get('welcome', False)
+
         return self.render_to_response(context)
 
 
