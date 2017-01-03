@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^timeline$', views.TimelineView.as_view(), name='timeline'),
     url(r'^logout$', views.LogoutView, name='logout'),
     url(r'^about$', TemplateView.as_view(template_name='about.html')),
-    url(r'^privacy', TemplateView.as_view(template_name='privacy.html')),
+    url(r'^privacy$', TemplateView.as_view(template_name='privacy.html')),
 ]
