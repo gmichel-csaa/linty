@@ -46,27 +46,31 @@ def pycodestyle(build, cwd):
 
 
 def eslint(build, cwd):
+    path = "/usr/local/bin:" + os.environ['PATH']
+    my_env = {'PATH': path}
+    binary = os.path.join(settings.BASE_DIR, 'node_modules/eslint/bin/eslint.js')
     try:
-        path = "/usr/local/bin:" + os.environ['PATH']
-        my_env = {'PATH': path}
-        binary = os.path.join(settings.BASE_DIR, 'node_modules/eslint/bin/eslint.js')
-        output = subprocess.run(
+        result = subprocess.run(
             [binary, cwd],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=my_env,
             universal_newlines=True
-        ).output
+        )
+        output = result.stdout
         passing = True
     except subprocess.CalledProcessError as e:
-        output = e.output
+        output = e.stdout
         passing = False
 
-    if output:
+    if not output:
+        output = ''
+    else:
         # Strip directory
         output = output.replace(cwd, '')
-        Result = apps.get_model('interface', 'Result')
-        Result.objects.create(build=build, linter=ESLINT, output=output)
+
+    Result = apps.get_model('interface', 'Result')
+    Result.objects.create(build=build, linter=ESLINT, output=output)
 
     return passing
