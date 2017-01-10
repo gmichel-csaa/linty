@@ -156,7 +156,7 @@ class Build(models.Model):
         if self.status == 'success':
             url = static('img/pass.png')
         elif self.status == 'pending':
-            url = static('img/pending')
+            url = static('img/pending.png')
         else:
             url = static('img/fail.png')
         return url
