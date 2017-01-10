@@ -90,6 +90,7 @@ ENV/
 
 .idea
 tmp
+node_modules
 
 db.sqlite3
 
