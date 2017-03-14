@@ -328,7 +328,7 @@ class TimelineView(StaffRequiredMixin, generic.ListView):
                 'type': 'build',
                 'repo_name': obj['repo__full_name'],
                 'created_at': obj['created_at'],
-                'finished_at': obj['finished_at']
+                'duration': obj['finished_at'] - obj['created_at'] if obj['finished_at'] else None
             } for obj in builds
         ]
         object_list.extend([

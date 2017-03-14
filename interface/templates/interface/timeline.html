@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load extra_tags %}
 
 {% block title %}Linty - Timeline{% endblock %}
 
@@ -47,7 +48,7 @@
                     </div>
                     <div class="date">
                         {% if obj.type == 'build' %}
-                        Started {{ obj.created_at|naturaltime }}{% if obj.finished_at %}, Finished {{ obj.finished_at|naturaltime }}{% endif %}
+                        {{ obj.created_at }}{% if obj.duration %}, {{ obj.duration|humanize_td }}{% endif %}
                         {% elif obj.type == 'repo' %}
                         Added {{ obj.created_at|naturaltime }}
                         {% endif %}
